@@ -18,7 +18,7 @@
 export default {}
 </script>
 
-<style scoped>
+<style>
 /* Base layout */
 .layout {
   font-family: Arial, sans-serif;

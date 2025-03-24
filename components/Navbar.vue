@@ -177,6 +177,7 @@ body {
   align-items: center;
   background-color: var(--bg-color);
   transition: var(--transition);
+  top: 0;
 }
 
 .navbar.scrolled {
@@ -193,6 +194,7 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  height: 100%;
 }
 
 /* Logo styles */
@@ -200,37 +202,31 @@ body {
   position: relative;
 }
 
-.logo-box {
-  margin-bottom: 25px;
-  transition: var(--transition);
-}
-
-.logo-box img {
-  max-width: 180px;
-  height: auto;
-}
-
-.logo-box a:hover {
-  opacity: 0.8;
-}
-
-.logo-widget .text p {
-  color: var(--text-light);
-  margin-bottom: 25px;
-  line-height: 1.7;
-}
-
 .logo-container {
   z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .default-logo {
+  margin-top: 15px;
   font-weight: 700;
   font-size: 1.5rem;
   background: linear-gradient(to right, var(--primary-color), #8b5cf6);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.default-logo img {
+  max-height: 40px;
+  width: auto;
+  vertical-align: middle;
 }
 
 /* Desktop menu */

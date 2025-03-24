@@ -2,7 +2,7 @@
   <footer class="main-footer">
     <div class="container">
       <div class="footer-content">
-        <div class="row">
+        <div class="row justify-content-between">
           <!-- Company Info Column -->
           <div class="col-lg-4 col-md-6 col-sm-12 footer-column">
             <div class="logo-widget footer-widget">
@@ -21,28 +21,32 @@
             </div>
           </div>
 
-          <!-- Services Column -->
-          <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
-            <div class="service-widget footer-widget">
-              <div class="footer-title">Services</div>
-              <ul class="list">
-                <li><a href="#">Water Surve</a></li>
-                <li><a href="#">Education for all</a></li>
-                <li><a href="#">Food Serving</a></li>
-                <li><a href="#">Animal Saves</a></li>
-                <li><a href="#">Help Orphan</a></li>
-              </ul>
-            </div>
-          </div>
+          <div class="col-lg-7 col-md-12 col-sm-12">
+            <div class="row">
+              <!-- Services Column -->
+              <div class="col-lg-6 col-md-6 col-sm-12 footer-column">
+                <div class="service-widget footer-widget">
+                  <div class="footer-title">Services</div>
+                  <ul class="list">
+                    <li><a href="#">Water Surve</a></li>
+                    <li><a href="#">Education for all</a></li>
+                    <li><a href="#">Food Serving</a></li>
+                    <li><a href="#">Animal Saves</a></li>
+                    <li><a href="#">Help Orphan</a></li>
+                  </ul>
+                </div>
+              </div>
 
-          <!-- Contact Info Column -->
-          <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
-            <div class="contact-widget footer-widget">
-              <div class="footer-title">Contacts</div>
-              <div class="text">
-                <p class="address"><i class="fas fa-map-marker-alt"></i> <span>Mendhurah Folheymaage, Ground Floor, Elha Didi Magu, S.Hithadhoo, Maldives</span></p>
-                <p class="phone"><i class="fas fa-phone-alt"></i> <span><a href="tel:+9603339796">+960 333-9796</a></span></p>
-                <p class="email"><i class="fas fa-envelope"></i> <span><a href="mailto:reservations@wanderlustadventuresmv.com">reservations@wanderlustadventuresmv.com</a></span></p>
+              <!-- Contact Info Column -->
+              <div class="col-lg-6 col-md-6 col-sm-12 footer-column">
+                <div class="contact-widget footer-widget">
+                  <div class="footer-title">Contacts</div>
+                  <div class="text">
+                    <p class="address"><i class="fas fa-map-marker-alt"></i> <span>Mendhurah Folheymaage, Ground Floor, Elha Didi Magu, S.Hithadhoo, Maldives</span></p>
+                    <p class="phone"><i class="fas fa-phone-alt"></i> <span><a href="tel:+9603339796">+960 333-9796</a></span></p>
+                    <p class="email"><i class="fas fa-envelope"></i> <span><a href="mailto:reservations@wanderlustadventuresmv.com">reservations@wanderlustadventuresmv.com</a></span></p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -51,6 +55,7 @@
     </div>
   </footer>
   <!-- main-footer end -->
+
 
   <div class="footer-bottom">
     <div class="container">
@@ -83,6 +88,7 @@
   --spacing-lg: 40px;
   --spacing-xl: 60px;
   --transition: all 0.3s ease;
+  --navbar-z-index: 50;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -151,6 +157,10 @@ ul {
   align-items: center;
 }
 
+.justify-content-between {
+  justify-content: space-between;
+}
+
 [class*="col-"] {
   position: relative;
   width: 100%;
@@ -168,14 +178,14 @@ ul {
     flex: 0 0 50%;
     max-width: 50%;
   }
+
+  .col-md-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
 }
 
 @media (min-width: 992px) {
-  .col-lg-3 {
-    flex: 0 0 25%;
-    max-width: 25%;
-  }
-
   .col-lg-4 {
     flex: 0 0 33.333333%;
     max-width: 33.333333%;
@@ -186,8 +196,9 @@ ul {
     max-width: 50%;
   }
 
-  .offset-lg-2 {
-    margin-left: 16.666667%;
+  .col-lg-7 {
+    flex: 0 0 58.333333%;
+    max-width: 58.333333%;
   }
 }
 
@@ -196,11 +207,12 @@ ul {
   position: relative;
   background: var(--background-dark);
   color: var(--text-light);
+  z-index: 10;
 }
 
 .footer-content {
   position: relative;
-  padding: 60px 0;
+  padding: 70px 0;
 }
 
 /* Animated world map background */
@@ -217,6 +229,7 @@ ul {
   opacity: 0.1;
   animation: float-bob 30s linear infinite;
   pointer-events: none;
+  z-index: -1;
 }
 
 @keyframes float-bob {
@@ -233,11 +246,16 @@ ul {
 
 /* Logo and company info section */
 .footer-column {
-  margin-bottom: 30px;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-widget {
   position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-widget {
@@ -245,7 +263,9 @@ ul {
 }
 
 .logo-container {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 10;
 }
 
 .logo-box {
@@ -273,6 +293,9 @@ ul {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-top: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-social li a {
@@ -300,7 +323,8 @@ ul {
   line-height: 1.4;
   color: var(--text-white);
   font-weight: 700;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  padding-left: 15px;
   padding-bottom: 10px;
 }
 
@@ -311,12 +335,18 @@ ul {
   bottom: 0;
   height: 2px;
   width: 40px;
+  margin-left: 15px;
   background: var(--primary-color);
 }
 
 /* Services List */
+.service-widget .list {
+  position: relative;
+  z-index: 10;
+}
+
 .service-widget .list li {
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 }
 
 .service-widget .list li a {
@@ -324,6 +354,7 @@ ul {
   position: relative;
   padding-left: 15px;
   transition: var(--transition);
+  display: inline-block;
 }
 
 .service-widget .list li a:before {
@@ -350,11 +381,16 @@ ul {
 }
 
 /* Contact Information */
+.contact-widget .text {
+  padding-left: 15px;
+  position: relative;
+  z-index: 10;
+}
+
 .contact-widget p {
   position: relative;
   color: var(--text-light);
-  margin-bottom: 15px;
-  padding-left: 30px;
+  margin-bottom: 20px;
   line-height: 1.6;
 }
 
@@ -363,6 +399,7 @@ ul {
   left: 0;
   top: 5px;
   color: var(--primary-color);
+  font-size: 18px;
 }
 
 .contact-widget p a {
@@ -384,6 +421,7 @@ ul {
   background: var(--background-darker);
   padding: 20px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 10;
 }
 
 .footer-bottom .copyright {
@@ -419,7 +457,7 @@ ul {
 /* Enhanced Responsive Design */
 @media (max-width: 1199px) {
   .footer-content {
-    padding: 50px 0;
+    padding: 60px 0;
   }
 
   .footer-content:before {
@@ -429,7 +467,7 @@ ul {
 
 @media (max-width: 991px) {
   .footer-content {
-    padding: 40px 0;
+    padding: 50px 0 30px;
   }
 
   .footer-column {
@@ -440,21 +478,19 @@ ul {
     width: 100%;
     background-position: center;
   }
-}
 
-@media (max-width: 767px) {
-  .footer-content {
-    padding: 40px 0 20px;
+  /* Start of mobile/tablet centering styles */
+  .service-widget, .contact-widget {
     text-align: center;
   }
 
-  .footer-title:after {
-    left: 50%;
-    transform: translateX(-50%);
+  .service-widget .list {
+    padding-left: 0;
+    display: inline-block;
   }
 
-  .footer-social {
-    justify-content: center;
+  .service-widget .list li {
+    text-align: center;
   }
 
   .service-widget .list li a {
@@ -469,16 +505,52 @@ ul {
     padding-left: 0;
   }
 
+  .contact-widget .text {
+    padding-left: 0;
+    text-align: center;
+  }
+
   .contact-widget p {
     padding-left: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
+    display: block;
   }
 
   .contact-widget p i {
     position: static;
-    margin-bottom: 5px;
+    display: block;
+    margin: 0 auto 8px;
+  }
+
+  .contact-widget p span {
+    display: block;
+  }
+
+  .footer-title {
+    text-align: center;
+    padding-left: 0;
+  }
+
+  .footer-title:after {
+    left: 50%;
+    margin-left: 0;
+    transform: translateX(-50%);
+  }
+  /* End of mobile/tablet centering styles */
+}
+
+@media (max-width: 767px) {
+  .footer-content {
+    padding: 40px 0 20px;
+    text-align: center;
+  }
+
+  .footer-column {
+    margin-bottom: 40px;
+  }
+
+  .footer-social {
+    justify-content: center;
   }
 
   .footer-bottom {
@@ -489,24 +561,6 @@ ul {
     justify-content: center;
     margin-top: 10px;
     flex-wrap: wrap;
-  }
-}
-
-@media (min-width: 768px) {
-  .footer-title {
-    margin-top: 0;
-  }
-
-  .contact-widget p.phone,
-  .contact-widget p.email {
-    display: flex;
-    align-items: center;
-  }
-
-  .contact-widget p.phone i,
-  .contact-widget p.email i {
-    top: 50%;
-    transform: translateY(-50%);
   }
 }
 
@@ -543,15 +597,30 @@ ul {
   .logo-widget .text p {
     margin-bottom: 20px;
   }
+}
 
-  .footer-content {
-    text-align: left;
-  }
+/* Prevent footer content from going over navbar */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
-  .footer-title:after {
-    left: 0;
-    transform: none;
-  }
+main {
+  flex: 1;
+}
+
+.main-footer,
+.footer-bottom {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure all footer elements respect stacking context */
+.main-footer *,
+.footer-bottom * {
+  position: relative;
+  z-index: inherit;
 }
 </style>
 <script setup lang="ts">
