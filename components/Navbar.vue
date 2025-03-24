@@ -1,190 +1,236 @@
 <template>
-  <nav class="navbar">
+  <nav class="navbar" :class="{ 'scrolled': hasScrolled }">
     <div class="navbar-container">
-      <!-- Header logo -->
-      <div class="logo">
-        <slot name="logo"><Tailwind /></slot>
-      </div>
-
-      <!-- Mobile toggle -->
-      <div class="mobile-toggle">
-        <button @click="drawer">
-          <svg
-              class="hamburger-icon"
-              fill="none" stroke-linecap="round"
-              stroke-linejoin="round" stroke-width="2"
-              viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Navbar -->
-      <div class="desktop-menu">
-        <ul class="nav-links">
-          <li><a href="/" :class="{ active: isActive('/') }">Home</a></li>
-          <li><a href="/packages" :class="{ active: isActive('/packages') }">Packages</a></li>
-          <li><a href="/about" :class="{ active: isActive('/about') }">About Us</a></li>
-          <li><a href="/contact-us" :class="{ active: isActive('/contact-us') }">Contact Us</a></li>
-        </ul>
-      </div>
-
-      <!-- Dark Background Transition -->
-      <transition
-          enter-class="opacity-0"
-          enter-active-class="ease-out transition-medium"
-          enter-to-class="opacity-100"
-          leave-class="opacity-100"
-          leave-active-class="ease-out transition-medium"
-          leave-to-class="opacity-0"
-      >
-        <div @keydown.esc="isOpen = false" v-show="isOpen" class="overlay">
-          <div @click="isOpen = false" class="overlay-background" tabindex="0"></div>
-        </div>
-      </transition>
-
-      <!-- Drawer Menu -->
-      <aside class="drawer-menu" :class="isOpen ? 'drawer-open' : 'drawer-closed'">
-        <div class="close-button-container">
-          <button class="close-button" @click="isOpen = false">
-            <svg
-                class="close-icon"
-                fill="none" stroke-linecap="round"
-                stroke-linejoin="round" stroke-width="2"
-                viewBox="0 0 24 24" stroke="currentColor">
-              <path d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-
-        <span @click="isOpen = false" class="drawer-logo">
-          <slot name="logo">Logo</slot>
-        </span>
-
-        <ul class="drawer-nav-links">
-          <li><a href="/" @click="isOpen = false" :class="{ active: isActive('/') }">Home</a></li>
-          <li><a href="/packages" @click="isOpen = false" :class="{ active: isActive('/packages') }">Packages</a></li>
-          <li><a href="/about" @click="isOpen = false" :class="{ active: isActive('/about') }">About Us</a></li>
-          <li><a href="/contact-us" @click="isOpen = false" :class="{ active: isActive('/contact-us') }">Contact Us</a></li>
-        </ul>
-
-        <div class="social-links-container">
-          <p class="social-text">follow us:</p>
-          <div class="social-icons">
-            <a href="#">
-              <svg
-                  aria-hidden="true" focusable="false"
-                  data-prefix="fab" data-icon="twitter"
-                  class="social-icon" role="img"
-                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path>
-              </svg>
-            </a>
-            <a href="#">
-              <svg
-                  aria-hidden="true" focusable="false"
-                  data-prefix="fab" data-icon="facebook-f"
-                  class="social-icon" role="img"
-                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                <path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"></path>
-              </svg>
-            </a>
-            <a href="#">
-              <svg
-                  aria-hidden="true" focusable="false"
-                  data-prefix="fab" data-icon="instagram"
-                  class="social-icon" role="img"
-                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path fill="currentColor" d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"></path>
-              </svg>
-            </a>
-            <a href="#">
-              <svg
-                  aria-hidden="true" focusable="false"
-                  data-prefix="fab" data-icon="youtube"
-                  class="social-icon" role="img"
-                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-                <path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"></path>
-              </svg>
-            </a>
+      <!-- Logo -->
+      <div class="logo-container">
+        <div class="logo-widget footer-widget">
+          <div class="logo-container">
+            <div class="default-logo">
+              <img src="/assets/logo/logo.svg" alt="WanderLust" width="auto" height="40">
+            </div>
           </div>
         </div>
-      </aside>
+      </div>
+
+
+      <!-- Desktop Menu -->
+      <div class="desktop-menu">
+        <ul class="nav-links">
+          <li v-for="(item, index) in navItems" :key="index">
+            <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link">
+              {{ item.label }}
+              <span class="nav-indicator" v-if="isActive(item.path)"></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Mobile Menu Toggle -->
+      <div class="mobile-toggle">
+        <button @click="toggleMobileMenu" class="hamburger" :class="{ 'open': isOpen }">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
     </div>
+
+    <!-- Mobile Menu Drawer with Animation -->
+    <transition name="slide">
+      <div v-if="isOpen" class="mobile-menu">
+        <div class="mobile-menu-container">
+          <div class="mobile-nav-items">
+            <a
+                v-for="(item, index) in navItems"
+                :key="index"
+                :href="item.path"
+                :class="{ 'active': isActive(item.path) }"
+                class="mobile-nav-link"
+                @click="isOpen = false"
+            >
+              {{ item.label }}
+            </a>
+          </div>
+
+          <div class="mobile-menu-footer">
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Twitter">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="social-icon">
+                  <path d="M22 4.01C21.0424 4.68544 19.9821 5.19755 18.86 5.53C18.2577 4.83755 17.4573 4.34523 16.567 4.12399C15.6767 3.90275 14.7395 3.96428 13.8821 4.29842C13.0247 4.63257 12.2884 5.22447 11.773 5.98979C11.2575 6.75511 10.9877 7.65376 11 8.57V9.57C9.24257 9.61323 7.50127 9.22543 5.93101 8.44863C4.36074 7.67182 3.01032 6.53114 2 5.13C2 5.13 -2 14.13 7 18.13C4.94053 19.5282 2.48716 20.2564 0 20.13C9 25.13 20 20.13 20 8.55C19.9991 8.27638 19.9723 8.00359 19.92 7.74C20.9406 6.73899 21.6608 5.45541 22 4.01Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="social-icon">
+                  <path d="M17 2H7C4.23858 2 2 4.23858 2 7V17C2 19.7614 4.23858 22 7 22H17C19.7614 22 22 19.7614 22 17V7C22 4.23858 19.7614 2 17 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M16 11.37C16.1234 12.2022 15.9813 13.0522 15.5938 13.799C15.2063 14.5458 14.5931 15.1514 13.8416 15.5297C13.0901 15.9079 12.2384 16.0396 11.4078 15.9059C10.5771 15.7723 9.80976 15.3801 9.21484 14.7852C8.61992 14.1902 8.22773 13.4229 8.09407 12.5922C7.9604 11.7616 8.09207 10.9099 8.47033 10.1584C8.84859 9.40685 9.45419 8.79374 10.201 8.40624C10.9478 8.01874 11.7978 7.87658 12.63 8C13.4789 8.12588 14.2649 8.52146 14.8717 9.12831C15.4785 9.73515 15.8741 10.5211 16 11.37Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M17.5 6.5H17.51" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="social-icon">
+                  <path d="M22.54 6.42C22.4212 5.94541 22.1793 5.51057 21.8387 5.15941C21.498 4.80824 21.0708 4.55318 20.6 4.42C18.88 4 12 4 12 4C12 4 5.12 4 3.4 4.46C2.92925 4.59318 2.50198 4.84824 2.16135 5.19941C1.82072 5.55057 1.57879 5.98541 1.46 6.46C1.14521 8.20556 0.991235 9.97631 1 11.75C0.988687 13.537 1.14266 15.3213 1.46 17.08C1.59096 17.5398 1.83831 17.9581 2.17814 18.2945C2.51798 18.6308 2.93882 18.8738 3.4 19C5.12 19.46 12 19.46 12 19.46C12 19.46 18.88 19.46 20.6 19C21.0708 18.8668 21.498 18.6118 21.8387 18.2606C22.1793 17.9094 22.4212 17.4746 22.54 17C22.8524 15.2676 22.9983 13.5103 23 11.75C23.0113 9.96295 22.8573 8.1787 22.54 6.42Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M9.75 15.02L15.5 11.75L9.75 8.47998V15.02Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Dark Overlay -->
+    <transition name="fade">
+      <div v-if="isOpen" class="overlay" @click="isOpen = false"></div>
+    </transition>
   </nav>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   data() {
     return {
-      isOpen: false
+      isOpen: false,
+      hasScrolled: false,
+      navItems: [
+        { label: 'Home', path: '/' },
+        { label: 'Packages', path: '/packages' },
+        { label: 'About Us', path: '/about' },
+        { label: 'Contact', path: '/contact-us' }
+      ]
     };
   },
   methods: {
-    drawer() {
+    toggleMobileMenu() {
       this.isOpen = !this.isOpen;
+      if (typeof window !== 'undefined') {
+        document.body.style.overflow = this.isOpen ? 'hidden' : '';
+      }
     },
-    isActive(route) {
-      return this.$route.path === route;
-    }
-  },
-  watch: {
-    isOpen: {
-      immediate: true,
-      handler(isOpen) {
-        if (process.client) {
-          if (isOpen) document.body.style.setProperty("overflow", "hidden");
-          else document.body.style.removeProperty("overflow");
-        }
+    isActive(route: string) {
+      return this.$route && this.$route.path === route;
+    },
+    handleScroll() {
+      if (typeof window !== 'undefined') {
+        this.hasScrolled = window.scrollY > 50;
       }
     }
   },
   mounted() {
-    document.addEventListener("keydown", e => {
-      if (e.keyCode === 27 && this.isOpen) this.isOpen = false;
-    });
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', this.handleScroll);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.isOpen = false;
+        }
+      });
+    }
+  },
+  beforeUnmount() {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
   }
-};
+});
 </script>
 
 <style>
-/* Reset box-sizing */
+/* Base styles and reset */
+:root {
+  --primary-color: #ff5e14;
+  --primary-hover: #4338ca;
+  --text-color: #1f2937;
+  --text-muted: #6b7280;
+  --bg-color: #ffffff;
+  --bg-accent: #f9fafb;
+  --border-color: #e5e7eb;
+  --nav-height: 80px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s ease;
+  --border-radius: 8px;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: var(--transition);
+}
+
 /* Navbar styles */
 .navbar {
   position: fixed;
   width: 100%;
-  padding: 24px;
-  background-color: transparent;
-  top: 0;
-  left: 0;
-  z-index: 1000;
+  z-index: 50;
+  padding: 0 24px;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  transition: var(--transition);
+}
+
+.navbar.scrolled {
+  box-shadow: var(--shadow-sm);
+  height: 70px;
+  background-color: var(--bg-color);
+  backdrop-filter: blur(10px);
 }
 
 .navbar-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
-/* Mobile menu toggle button */
-.mobile-toggle {
-  display: block;
+/* Logo styles */
+.logo-widget {
+  position: relative;
 }
 
-.hamburger-icon {
-  height: 32px;
-  width: 32px;
-  fill: currentColor;
-  color: black;
+.logo-box {
+  margin-bottom: 25px;
+  transition: var(--transition);
+}
+
+.logo-box img {
+  max-width: 180px;
+  height: auto;
+}
+
+.logo-box a:hover {
+  opacity: 0.8;
+}
+
+.logo-widget .text p {
+  color: var(--text-light);
+  margin-bottom: 25px;
+  line-height: 1.7;
+}
+
+.logo-container {
+  z-index: 60;
+}
+
+.default-logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  background: linear-gradient(to right, var(--primary-color), #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Desktop menu */
@@ -192,179 +238,219 @@ export default {
   display: none;
 }
 
+@media (min-width: 768px) {
+  .desktop-menu {
+    display: flex;
+    align-items: center;
+  }
+}
+
 .nav-links {
   display: flex;
   list-style: none;
-  padding: 0;
-  margin: 0;
-  font-family: sans-serif;
-  font-size: 14px;
-}
-
-.nav-links li {
-  margin: 0 16px;
-}
-
-.nav-links a {
-  text-decoration: none;
-  color: black;
-}
-
-.nav-links a.active {
-  border-bottom: 2px solid #3b82f6;
-  padding-bottom: 4px;
-}
-
-.sign-up-btn {
-  background-color: #3b82f6;
-  padding: 8px 12px;
-  border-radius: 4px;
-  color: white !important;
-  font-weight: 600;
-}
-
-.sign-up-btn:hover {
-  background-color: #2563eb;
-}
-
-/* Overlay styles */
-.overlay {
-  z-index: 10;
-  position: fixed;
-  inset: 0;
-  transition: opacity 0.3s;
-}
-
-.overlay-background {
-  position: absolute;
-  inset: 0;
-  background-color: black;
-  opacity: 0.5;
-}
-
-/* Drawer menu styles */
-.drawer-menu {
-  padding: 20px;
-  transform: translateX(0);
-  top: 0;
-  left: 0;
-  width: 256px;
-  background-color: white;
-  position: fixed;
-  height: 100%;
-  overflow: auto;
-  transition: all 0.3s ease-in-out;
-  z-index: 30;
-}
-
-.drawer-closed {
-  transform: translateX(-100%);
-}
-
-.drawer-open {
-  transform: translateX(0);
-}
-
-.close-button-container {
-  position: relative;
-}
-
-.close-button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin-top: 16px;
   margin-right: 16px;
-  background: none;
-  border: none;
-  cursor: pointer;
 }
 
-.close-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.drawer-logo {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.drawer-nav-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-family: sans-serif;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.drawer-nav-links li {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.drawer-nav-links li:last-child {
-  border-bottom: none;
-}
-
-.drawer-nav-links a {
+/* Nav link with animated indicator */
+.nav-link {
+  position: relative;
   display: inline-block;
-  margin: 16px 0;
+  padding: 8px 16px;
+  color: var(--text-color);
   text-decoration: none;
-  color: black;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--transition);
 }
 
-.drawer-sign-up-btn {
-  display: block;
-  width: 100%;
-  text-align: center;
-  margin: 32px 0 !important;
-  font-weight: 600;
-  background-color: #3b82f6;
-  padding: 8px 12px;
-  border-radius: 4px;
-  color: white !important;
+.nav-link:hover {
+  color: var(--primary-color);
 }
 
-.drawer-sign-up-btn:hover {
-  background-color: #2563eb;
+.nav-link.active {
+  color: var(--primary-color);
 }
 
-/* Social media section */
-.social-links-container {
-  margin-top: 16px;
-}
-
-.social-text {
-  font-style: italic;
-  font-family: sans-serif;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.social-icons {
-  display: flex;
-  gap: 20px;
-  margin-top: 16px;
-}
-
-.social-icon {
-  height: 20px;
+/* New animated indicator */
+.nav-indicator {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 20px;
-  fill: currentColor;
-  color: #4b5563;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 4px;
+  /* Animation on entry */
+  animation: indicator-enter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Media query for desktop */
+@keyframes indicator-enter {
+  0% {
+    transform: translateX(-50%) scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile menu toggle */
+.mobile-toggle {
+  z-index: 60;
+}
+
 @media (min-width: 768px) {
   .mobile-toggle {
     display: none;
   }
+}
 
-  .desktop-menu {
-    display: block;
-  }
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-color);
+  transition: var(--transition);
+  border-radius: 4px;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Mobile menu */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: var(--bg-color);
+  z-index: 40;
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+}
+
+.mobile-menu-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 100px 32px 32px;
+  height: 100%;
+}
+
+.mobile-nav-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav-link {
+  position: relative;
+  font-size: 1.25rem;
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.mobile-nav-link:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-link.active {
+  color: var(--primary-color);
+}
+
+.mobile-nav-link:hover {
+  color: var(--primary-color);
+}
+
+.mobile-menu-footer {
+  margin-top: 32px;
+}
+
+.social-links {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--bg-accent);
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.social-link:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  backdrop-filter: blur(2px);
+}
+
+/* Transitions */
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

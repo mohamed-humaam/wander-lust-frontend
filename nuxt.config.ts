@@ -22,15 +22,15 @@ export default defineNuxtConfig({
     },
   },
 
-  tailwindcss: {
-    cssPath: "~/assets/css/tailwind.css",
-    configPath: "tailwind.config",
-    exposeConfig: {
-      level: 2,
-    },
-    config: {},
-    viewer: true,
-  },
+  // tailwindcss: {
+  //   cssPath: "~/assets/css/tailwind.css",
+  //   configPath: "tailwind.config",
+  //   exposeConfig: {
+  //     level: 2,
+  //   },
+  //   config: {},
+  //   viewer: true,
+  // },
 
   compatibilityDate: "2025-03-22",
 })
