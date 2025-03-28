@@ -6,7 +6,7 @@
     </div>
 
     <form @submit.prevent="performSearch" class="search-form">
-      <!-- Location Search -->
+      <!-- Location Search - Full Width on Mobile -->
       <div class="form-group location-group" :class="{ 'has-suggestions': locationSuggestions.length }">
         <div class="input-wrapper">
           <label for="location">
@@ -40,10 +40,10 @@
         </div>
       </div>
 
-      <!-- Date Range Picker -->
+      <!-- Date Range Picker - Responsive Layout -->
       <div class="form-group date-group">
         <div class="date-range-wrapper">
-          <div class="date-input">
+          <div class="date-input check-in">
             <label for="checkIn">
               <i class="icon icon-calendar"></i>
               <span>Check-in</span>
@@ -56,10 +56,10 @@
                 required
             >
           </div>
-          <div class="date-separator">
+          <div class="date-separator mobile-hidden">
             <i class="icon icon-arrow-right"></i>
           </div>
-          <div class="date-input">
+          <div class="date-input check-out">
             <label for="checkOut">
               <i class="icon icon-calendar"></i>
               <span>Check-out</span>
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <!-- Travelers Selector -->
+      <!-- Travelers Selector - Responsive -->
       <div class="form-group travelers-group">
         <div class="travelers-input-wrapper">
           <label @click="toggleTravelersDropdown">
@@ -860,5 +860,104 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 .travelers-input.active {
   border-color: rgba(255, 255, 255, 0.8) !important;
   background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .form-group {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 250px;
+  }
+
+  .location-group {
+    flex: 1 1 100%;
+  }
+
+  .date-group {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+
+  .travelers-group {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+
+  .search-group {
+    flex: 1 1 100%;
+  }
+
+  .date-range-wrapper {
+    flex-direction: column;
+  }
+
+  .date-input {
+    width: 100%;
+  }
+
+  .date-separator {
+    display: none;
+  }
+
+  .check-in, .check-out {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .form-group {
+    flex: 1 1 100%;
+    min-width: auto;
+  }
+
+  .search-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .search-header p {
+    font-size: 1rem;
+  }
+
+  .travelers-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+}
+
+/* Mobile-specific input styles */
+@media (max-width: 480px) {
+  .search-container {
+    padding: 1rem;
+  }
+
+  input, .travelers-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Utility classes for responsive design */
+.mobile-hidden {
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .mobile-hidden {
+    display: none;
+  }
 }
 </style>
