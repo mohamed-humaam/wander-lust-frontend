@@ -1,17 +1,19 @@
 <template>
   <div class="home-page">
     <Hero />
-    <!-- Add other components or sections of your homepage here -->
+    <AirlineCarousel />
   </div>
 </template>
 
 <script>
 import Hero from '~/components/homepage/Hero.vue'
+import AirlineCarousel from '~/components/homepage/AirlineCarousel.vue'
 
 export default {
   name: 'HomePage',
   components: {
-    Hero
+    Hero,
+    AirlineCarousel
   }
 }
 </script>
