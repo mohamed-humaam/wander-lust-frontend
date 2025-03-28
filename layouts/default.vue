@@ -1,21 +1,59 @@
 <template>
   <div class="layout">
     <!-- Navbar at the top -->
-    <Navbar />
+    <Navbar ref="navbar" />
 
     <!-- Main content area -->
-    <main class="main-content">
-      <slot />
-    </main>
+    <div class="content-wrapper">
+      <main class="main-content" ref="mainContent">
+        <slot />
+      </main>
 
-    <!-- Footer at the bottom -->
-    <Footer />
-
+      <!-- Footer at the bottom -->
+      <Footer />
+    </div>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      scrollPosition: 0
+    }
+  },
+  mounted() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', this.handleScroll);
+    }
+  },
+  beforeUnmount() {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
+  },
+  methods: {
+    handleScroll() {
+      if (typeof window !== 'undefined') {
+        this.scrollPosition = window.scrollY;
+
+        // Get the navbar element
+        const navbar = this.$refs.navbar.$el;
+
+        // Calculate opacity based on scroll position
+        // Start becoming transparent after 50px of scroll
+        const opacity = Math.min(1, this.scrollPosition / 50);
+
+        // Apply background opacity
+        navbar.style.backgroundColor = `rgba(255, 255, 255, ${1 - opacity * 0.9})`;
+        navbar.style.backdropFilter = `blur(${opacity * 5}px)`;
+        navbar.style.boxShadow = opacity > 0
+            ? 'var(--shadow-sm)'
+            : 'none';
+      }
+    }
+  }
+}
 </script>
 
 <style>
@@ -29,18 +67,30 @@ export default {}
   overflow-x: hidden;
 }
 
-.main-content {
-  //padding-top: 80px;
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
   flex: 1;
-  //padding-left: 20px;
-  //padding-right: 20px;
-  //padding-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.main-content {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  padding-top: var(--nav-height);
+}
+
+footer {
+  position: relative;
+  z-index: 0;
 }
 
 /* Media query to match navbar.vue responsive breakpoint */
 @media (min-width: 768px) {
   .main-content {
-    //padding-top: 100px;
+    padding-top: var(--nav-height);
   }
 }
 </style>
