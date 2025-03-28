@@ -6,7 +6,7 @@
     </div>
 
     <form @submit.prevent="performSearch" class="search-form">
-      <!-- Location Search - Full Width on Mobile -->
+      <!-- Location Search -->
       <div class="form-group location-group" :class="{ 'has-suggestions': locationSuggestions.length }">
         <div class="input-wrapper">
           <label for="location">
@@ -14,16 +14,23 @@
             <span>Destination</span>
           </label>
           <input
+              ref="locationInput"
               type="text"
               id="location"
               v-model="searchData.location"
               @input="searchLocations"
               @focus="showLocationSuggestions = true"
+              @blur="handleLocationBlur"
+              @keydown.esc="showLocationSuggestions = false"
               placeholder="City, Hotels and Resorts"
               required
               autocomplete="off"
           >
-          <div v-if="showLocationSuggestions && locationSuggestions.length" class="location-suggestions">
+          <div
+              v-if="showLocationSuggestions && locationSuggestions.length"
+              class="location-suggestions"
+              @mousedown.prevent
+          >
             <div
                 v-for="(suggestion, index) in locationSuggestions"
                 :key="index"
@@ -32,15 +39,14 @@
             >
               <i class="icon icon-location"></i>
               <div class="suggestion-details">
-                <div class="suggestion-title">{{ suggestion.name }}</div>
-                <div class="suggestion-subtitle">{{ suggestion.type }}</div>
+                <div class="suggestion-title">{{ suggestion }}</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Date Range Picker - Responsive Layout -->
+      <!-- Date Range Picker -->
       <div class="form-group date-group">
         <div class="date-range-wrapper">
           <div class="date-input check-in">
@@ -75,7 +81,7 @@
         </div>
       </div>
 
-      <!-- Travelers Selector - Responsive -->
+      <!-- Travelers Selector -->
       <div class="form-group travelers-group">
         <div class="travelers-input-wrapper">
           <label @click="toggleTravelersDropdown">
@@ -109,7 +115,6 @@
               </div>
 
               <div class="dropdown-content">
-                <!-- Adults Counter -->
                 <div class="dropdown-item">
                   <div class="counter-info">
                     <div class="counter-title">Adults</div>
@@ -138,7 +143,6 @@
                   </div>
                 </div>
 
-                <!-- Children Counter -->
                 <div class="dropdown-item">
                   <div class="counter-info">
                     <div class="counter-title">Children</div>
@@ -167,7 +171,6 @@
                   </div>
                 </div>
 
-                <!-- Rooms Counter -->
                 <div class="dropdown-item">
                   <div class="counter-info">
                     <div class="counter-title">Rooms</div>
@@ -222,148 +225,129 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      showTravelersDropdown: false,
-      showLocationSuggestions: false,
-      locationSuggestions: [],
-      searchData: {
-        location: '',
-        checkIn: '',
-        checkOut: '',
-        adults: 2,
-        children: 0,
-        rooms: 1
-      }
-    }
-  },
-  computed: {
-    travellerSummary() {
-      let summary = `${this.searchData.adults} Adult${this.searchData.adults !== 1 ? 's' : ''}`
-      if (this.searchData.children > 0) {
-        summary += ` • ${this.searchData.children} Child${this.searchData.children !== 1 ? 'ren' : ''}`
-      }
-      summary += ` • ${this.searchData.rooms} Room${this.searchData.rooms !== 1 ? 's' : ''}`
-      return summary
-    },
-    minCheckInDate() {
-      return new Date().toISOString().split('T')[0]
-    },
-    minCheckOutDate() {
-      if (!this.searchData.checkIn) return this.minCheckInDate
-      const nextDay = new Date(this.searchData.checkIn)
-      nextDay.setDate(nextDay.getDate() + 1)
-      return nextDay.toISOString().split('T')[0]
-    }
-  },
-  watch: {
-    'searchData.checkIn'(newVal) {
-      if (new Date(this.searchData.checkOut) <= new Date(newVal)) {
-        const nextDay = new Date(newVal)
-        nextDay.setDate(nextDay.getDate() + 1)
-        this.searchData.checkOut = nextDay.toISOString().split('T')[0]
-      }
-    }
-  },
-  methods: {
-    toggleTravelersDropdown() {
-      this.showTravelersDropdown = !this.showTravelersDropdown
-      this.showLocationSuggestions = false
-    },
-    incrementAdults() {
-      if (this.searchData.adults < 10) this.searchData.adults++
-    },
-    decrementAdults() {
-      if (this.searchData.adults > 1) this.searchData.adults--
-    },
-    incrementChildren() {
-      if (this.searchData.children < 6) this.searchData.children++
-    },
-    decrementChildren() {
-      if (this.searchData.children > 0) this.searchData.children--
-    },
-    incrementRooms() {
-      if (this.searchData.rooms < 5) this.searchData.rooms++
-    },
-    decrementRooms() {
-      if (this.searchData.rooms > 1) this.searchData.rooms--
-    },
-    searchLocations() {
-      // Mock API call with more detailed results
-      const mockLocations = [
-        { name: 'The Ritz-Carlton, Maldives', type: 'Luxury Resort' },
-        { name: 'Conrad Maldives Rangali Island', type: '5-Star Resort' },
-        { name: 'Soneva Fushi', type: 'Eco Luxury Resort' },
-        { name: 'Four Seasons Resort Maldives', type: 'Private Island' },
-        { name: 'St. Regis Maldives Vommuli Resort', type: 'Luxury Villas' }
-      ]
+<script setup>
+import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
+import {useGetLocations} from "~/composables/api-fetch.js";
 
-      this.locationSuggestions = mockLocations.filter(loc =>
-          loc.name.toLowerCase().includes(this.searchData.location.toLowerCase()) ||
-          loc.type.toLowerCase().includes(this.searchData.location.toLowerCase())
-      ).slice(0, 5)
-    },
-    selectLocation(location) {
-      this.searchData.location = location.name
-      this.showLocationSuggestions = false
-    },
-    performSearch() {
-      if (!this.searchData.location) {
-        this.$toast.error('Please select a destination')
-        return
-      }
+const emit = defineEmits(['search'])
 
-      if (new Date(this.searchData.checkOut) <= new Date(this.searchData.checkIn)) {
-        this.$toast.error('Check-out date must be after check-in date')
-        return
-      }
+const showTravelersDropdown = ref(false)
+const showLocationSuggestions = ref(false)
+const locationSuggestions = ref([])
 
-      this.$emit('search', { ...this.searchData })
-    },
-    handleClickOutside(event) {
-      if (!this.$el.contains(event.target)) {
-        this.showTravelersDropdown = false
-        this.showLocationSuggestions = false
-      }
-    }
-  },
-  mounted() {
-    const today = new Date()
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+const searchData = ref({
+  location: '',
+  checkIn: '',
+  checkOut: '',
+  adults: 2,
+  children: 0,
+  rooms: 1
+})
 
-    this.searchData.checkIn = today.toISOString().split('T')[0]
-    this.searchData.checkOut = tomorrow.toISOString().split('T')[0]
+const searchedLocations = useGetLocations({search: computed(() => searchData.value.location)})
 
-    document.addEventListener('click', this.handleClickOutside)
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', this.handleClickOutside)
+// Computed properties
+const travellerSummary = computed(() => {
+  const {adults, children, rooms} = searchData.value
+  return `${adults} Adult${adults !== 1 ? 's' : ''}${children > 0 ? ` • ${children} Child${children !== 1 ? 'ren' : ''}` : ''} • ${rooms} Room${rooms !== 1 ? 's' : ''}`
+})
+
+const minCheckInDate = computed(() => new Date().toISOString().split('T')[0])
+
+const minCheckOutDate = computed(() => {
+  if (!searchData.value.checkIn) return minCheckInDate.value
+  const nextDay = new Date(searchData.value.checkIn)
+  nextDay.setDate(nextDay.getDate() + 1)
+  return nextDay.toISOString().split('T')[0]
+})
+
+// Watchers
+watch(() => searchData.value.checkIn, (newVal) => {
+  if (new Date(searchData.value.checkOut) <= new Date(newVal)) {
+    const nextDay = new Date(newVal)
+    nextDay.setDate(nextDay.getDate() + 1)
+    searchData.value.checkOut = nextDay.toISOString().split('T')[0]
+  }
+})
+
+// Methods
+const toggleTravelersDropdown = () => {
+  showTravelersDropdown.value = !showTravelersDropdown.value
+  showLocationSuggestions.value = false
+}
+
+const incrementAdults = () => searchData.value.adults < 10 && searchData.value.adults++
+const decrementAdults = () => searchData.value.adults > 1 && searchData.value.adults--
+const incrementChildren = () => searchData.value.children < 6 && searchData.value.children++
+const decrementChildren = () => searchData.value.children > 0 && searchData.value.children--
+const incrementRooms = () => searchData.value.rooms < 5 && searchData.value.rooms++
+const decrementRooms = () => searchData.value.rooms > 1 && searchData.value.rooms--
+
+const searchLocations = () => {
+  locationSuggestions.value = searchedLocations.value?.data
+      ?.map(location => location.name)
+      ?.filter(name => name.toLowerCase().includes(searchData.value.location.toLowerCase()))
+      ?.slice(0, 5) || []
+}
+
+const selectLocation = (location) => {
+  searchData.value.location = location
+  showLocationSuggestions.value = false
+}
+
+const performSearch = () => {
+  if (!searchData.value.location) return
+  if (new Date(searchData.value.checkOut) <= new Date(searchData.value.checkIn)) return
+
+  emit('search', {...searchData.value})
+}
+
+//Remove Focus
+const locationInput = ref(null)
+
+const handleLocationBlur = () => {
+  // Use setTimeout to allow click events to process before closing
+  setTimeout(() => {
+    showLocationSuggestions.value = false
+  }, 200)
+}
+
+const handleClickOutside = (event) => {
+  if (!event.target.closest('.location-group') && !event.target.closest('.travelers-dropdown')) {
+    showTravelersDropdown.value = false
+    showLocationSuggestions.value = false
   }
 }
+
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    showLocationSuggestions.value = false
+    // Optionally focus back on the input
+    locationInput.value?.focus()
+  }
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  searchData.value.checkIn = today.toISOString().split('T')[0]
+  searchData.value.checkOut = tomorrow.toISOString().split('T')[0]
+
+  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <style scoped>
 /* Base Styles */
-:root {
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
-  --text-color: #1f2937;
-  --text-light: rgba(255, 255, 255, 0.8);
-  --border-color: rgba(255, 255, 255, 0.5);
-  --bg-color: transparent;
-  --bg-hover: rgba(255, 255, 255, 0.1);
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.375rem;
-  --transition: all 0.2s ease;
-}
-
 .search-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -381,12 +365,14 @@ export default {
   color: #ffffff;
   margin-bottom: 0.75rem;
   line-height: 1.2;
+  font-family: Arial, sans-serif;
 }
 
 .search-header p {
   font-size: 1.25rem;
   color: #ffffff;
   font-weight: 400;
+  font-family: Arial, sans-serif;
 }
 
 /* Form Layout */
@@ -397,7 +383,7 @@ export default {
   background: rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(0.5rem);
 }
@@ -427,32 +413,25 @@ input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0.5rem;
-  background: var(--bg-color);
-  transition: var(--transition);
-  color: var(--text-color);
+  background: transparent;
+  transition: all 0.2s ease;
+  color: #1f2937;
   height: 48px;
 }
 
 input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: #1f2937;
   font-family: Arial, sans-serif;
   font-size: 16px;
 }
 
 input:focus {
   outline: none;
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-/* Destination input specific styles */
-#location::placeholder {
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  color: #1f2937;
 }
 
 /* Icon Styles */
@@ -512,7 +491,7 @@ input:focus {
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0.5rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 50;
   backdrop-filter: blur(10px);
 }
@@ -523,7 +502,7 @@ input:focus {
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
 
 .suggestion-item:hover {
@@ -531,17 +510,13 @@ input:focus {
 }
 
 .suggestion-details {
-  flex: 1;
+  //flex: 1;
+  //flex: 1;
 }
 
 .suggestion-title {
   font-weight: 500;
-  color: var(--text-light);
-}
-
-.suggestion-subtitle {
-  font-size: 0.8125rem;
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Date Range Picker */
@@ -561,15 +536,10 @@ input:focus {
 
 .date-separator {
   display: flex;
+  margin-top: 2rem;
   align-items: center;
   padding: 0 0.25rem;
-  color: var(--text-light);
-}
-
-/* Date input specific styles */
-input[type="date"] {
-  font-family: Arial, sans-serif;
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Travelers Selector */
@@ -584,17 +554,17 @@ input[type="date"] {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
   height: 48px;
-  color: var(--text-color);
-  background: var(--bg-color);
+  color: #1f2937;
+  background: transparent;
 }
 
 .travelers-input:hover {
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .travelers-input.active {
@@ -619,7 +589,7 @@ input[type="date"] {
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0.5rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 40;
   padding: 1rem;
   backdrop-filter: blur(10px);
@@ -635,7 +605,7 @@ input[type="date"] {
 .dropdown-header h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .close-button {
@@ -643,12 +613,12 @@ input[type="date"] {
   border: none;
   padding: 0.25rem;
   cursor: pointer;
-  color: var(--text-light);
-  transition: var(--transition);
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
 }
 
 .close-button:hover {
-  color: var(--text-color);
+  color: #1f2937;
 }
 
 .dropdown-content {
@@ -668,7 +638,7 @@ input[type="date"] {
 
 .counter-title {
   font-weight: 500;
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .counter-subtitle {
@@ -692,7 +662,7 @@ input[type="date"] {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
   color: white;
 }
 
@@ -706,7 +676,7 @@ input[type="date"] {
 }
 
 .counter-value {
-  color: var(--text-light);
+  color: rgba(255, 255, 255, 0.8);
   min-width: 1.5rem;
   text-align: center;
   font-weight: 500;
@@ -720,17 +690,17 @@ input[type="date"] {
 .apply-button {
   width: 100%;
   padding: 0.625rem;
-  background: var(--primary-color);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
 }
 
 .apply-button:hover {
-  background: var(--primary-hover);
+  background: #1d4ed8;
 }
 
 /* Search Button */
@@ -746,20 +716,20 @@ input[type="date"] {
   gap: 0.5rem;
   width: 100%;
   padding: 0.875rem;
-  background: var(--primary-color);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 0.5rem;
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
   height: 48px;
 }
 
 .search-btn:hover {
-  background: var(--primary-hover);
+  background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Animations */
@@ -818,48 +788,10 @@ input[type="date"] {
   }
 }
 
-/* Accessibility */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
 /* Date input styling */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   opacity: 0.7;
-}
-
-input[type="date"]::-webkit-datetime-edit-text,
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field {
-  color: #1f2937;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-}
-
-/* Custom styling for all input boxes */
-.input-wrapper input,
-.date-input input,
-.travelers-input {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  color: #1f2937 !important;
-}
-
-.input-wrapper input:focus,
-.date-input input:focus,
-.travelers-input.active {
-  border-color: rgba(255, 255, 255, 0.8) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Responsive Breakpoints */
@@ -941,16 +873,11 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 
 /* Mobile-specific input styles */
 @media (max-width: 480px) {
-  .search-container {
-    padding: 1rem;
-  }
-
   input, .travelers-input {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
 }
 
-/* Utility classes for responsive design */
 .mobile-hidden {
   display: block;
 }

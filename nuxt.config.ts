@@ -10,7 +10,8 @@ export default defineNuxtConfig({
     ],
 
     plugins: [
-        '~/plugins/click-outside.js'
+        '~/plugins/click-outside.js',
+        "~/plugins/query-params.js"
     ],
 
     app: {
@@ -26,15 +27,11 @@ export default defineNuxtConfig({
         },
     },
 
-    // tailwindcss: {
-    //   cssPath: "~/assets/css/tailwind.css",
-    //   configPath: "tailwind.config",
-    //   exposeConfig: {
-    //     level: 2,
-    //   },
-    //   config: {},
-    //   viewer: true,
-    // },
+    runtimeConfig: {
+        public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://wander-lust.test/api',
+        },
+    },
 
     compatibilityDate: "2025-03-22",
 })
