@@ -30,17 +30,17 @@ export default {}
 }
 
 .main-content {
-  padding-top: 80px;
+  //padding-top: 80px;
   flex: 1;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
+  //padding-left: 20px;
+  //padding-right: 20px;
+  //padding-bottom: 20px;
 }
 
 /* Media query to match navbar.vue responsive breakpoint */
 @media (min-width: 768px) {
   .main-content {
-    padding-top: 100px;
+    //padding-top: 100px;
   }
 }
 </style>
