@@ -31,6 +31,8 @@ export default {
         '/assets/airlines/bangkok.svg',
         '/assets/airlines/batik.svg',
         '/assets/airlines/emirates.svg',
+        '/assets/airlines/air-arabia.svg',
+        '/assets/airlines/azerbaijan.svg',
         '/assets/airlines/ethihad.svg',
         '/assets/airlines/flydubai.svg',
         '/assets/airlines/indigo.svg',
