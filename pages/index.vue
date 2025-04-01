@@ -5,6 +5,8 @@
     <AirlineCarousel />
 
     <WhyUs />
+
+    <GoogleReviews />
   </div>
 </template>
 
@@ -12,13 +14,15 @@
 import Hero from '~/components/homepage/Hero.vue'
 import AirlineCarousel from '~/components/homepage/AirlineCarousel.vue'
 import WhyUs from "~/components/homepage/WhyUs.vue";
+import GoogleReviews from '~/components/homepage/GoogleReviews.vue';
 
 export default {
   name: 'HomePage',
   components: {
     WhyUs,
     Hero,
-    AirlineCarousel
+    AirlineCarousel,
+    GoogleReviews
   }
 }
 </script>
