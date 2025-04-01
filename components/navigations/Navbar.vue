@@ -12,15 +12,74 @@
         </div>
       </div>
 
-
       <!-- Desktop Menu -->
       <div class="desktop-menu">
         <ul class="nav-links">
-          <li v-for="(item, index) in navItems" :key="index">
-            <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link">
-              {{ item.label }}
-              <span class="nav-indicator" v-if="isActive(item.path)"></span>
-            </a>
+          <li v-for="(item, index) in navItems" :key="index" class="nav-item">
+            <!-- Regular menu item without dropdown -->
+            <template v-if="!item.hasDropdown">
+              <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link">
+                {{ item.label }}
+                <span class="nav-indicator" v-if="isActive(item.path)"></span>
+              </a>
+            </template>
+
+            <!-- Menu item with dropdown -->
+            <template v-else>
+              <div class="dropdown-container">
+                <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link with-dropdown">
+                  {{ item.label }}
+                  <span class="nav-indicator" v-if="isActive(item.path)"></span>
+                  <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </a>
+                <div class="dropdown-menu">
+                  <div class="dropdown-content">
+                    <div v-for="category in parentCategories" :key="category.id" class="dropdown-item-container">
+                      <a
+                          :href="`/packages/category/${category.slug}`"
+                          class="dropdown-item"
+                          @mouseenter="handleParentHover(category.id)"
+                      >
+                        {{ category.name }}
+                        <svg
+                            v-if="hasChildren(category.id)"
+                            class="dropdown-submenu-icon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+
+                      <!-- Child categories dropdown -->
+                      <div
+                          v-if="hasChildren(category.id)"
+                          class="dropdown-submenu"
+                          :class="{ 'visible': activeParentId === category.id }"
+                      >
+                        <a
+                            v-for="child in getChildCategories(category.id)"
+                            :key="child.id"
+                            :href="`/packages/category/${child.slug}`"
+                            class="dropdown-subitem"
+                        >
+                          {{ child.name }}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
           </li>
         </ul>
       </div>
@@ -40,16 +99,58 @@
       <div v-if="isOpen" class="mobile-menu">
         <div class="mobile-menu-container">
           <div class="mobile-nav-items">
-            <a
-                v-for="(item, index) in navItems"
-                :key="index"
-                :href="item.path"
-                :class="{ 'active': isActive(item.path) }"
-                class="mobile-nav-link"
-                @click="isOpen = false"
-            >
-              {{ item.label }}
-            </a>
+            <!-- Regular menu items -->
+            <template v-for="(item, index) in navItems" :key="index">
+              <template v-if="!item.hasDropdown">
+                <a
+                    :href="item.path"
+                    :class="{ 'active': isActive(item.path) }"
+                    class="mobile-nav-link"
+                    @click="isOpen = false"
+                >
+                  {{ item.label }}
+                </a>
+              </template>
+
+              <!-- Dropdown for mobile -->
+              <template v-else>
+                <div class="mobile-dropdown">
+                  <div
+                      class="mobile-nav-link with-dropdown"
+                      :class="{ 'active': isActive(item.path) }"
+                      @click="toggleMobileDropdown(index)"
+                  >
+                    {{ item.label }}
+                    <svg
+                        class="dropdown-icon"
+                        :class="{ 'rotate': openMobileDropdown === index }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                  <div class="mobile-dropdown-content" v-show="openMobileDropdown === index">
+                    <a
+                        v-for="category in categories"
+                        :key="category.id"
+                        :href="`/packages/category/${category.slug}`"
+                        class="mobile-dropdown-item"
+                        @click="isOpen = false"
+                    >
+                      {{ category.name }}
+                    </a>
+                  </div>
+                </div>
+              </template>
+            </template>
           </div>
 
           <div class="mobile-menu-footer">
@@ -93,34 +194,96 @@ export default defineComponent({
     return {
       isOpen: false,
       hasScrolled: false,
+      openMobileDropdown: null,
+      categories: [],
       navItems: [
         { label: 'Home', path: '/' },
-        { label: 'Packages', path: '/packages' },
+        {
+          label: 'Packages',
+          path: '/packages',
+          hasDropdown: true
+        },
         { label: 'About Us', path: '/about' },
         { label: 'Contact', path: '/contact-us' }
       ]
     };
   },
   methods: {
+    /**
+     * Toggles the mobile menu open/closed state
+     * Also handles body scroll locking when menu is open
+     */
     toggleMobileMenu() {
       this.isOpen = !this.isOpen;
       if (typeof window !== 'undefined') {
         document.body.style.overflow = this.isOpen ? 'hidden' : '';
       }
     },
-    isActive(route: string) {
+
+    /**
+     * Toggles a specific dropdown menu in mobile view
+     * @param {number} index - The index of the dropdown to toggle
+     */
+    toggleMobileDropdown(index) {
+      this.openMobileDropdown = this.openMobileDropdown === index ? null : index;
+    },
+
+    /**
+     * Checks if the current route matches the given path
+     * @param {string} route - The route path to check
+     * @returns {boolean} - True if current route matches given path
+     */
+    isActive(route) {
       return this.$route && this.$route.path === route;
     },
+
+    /**
+     * Handles scroll events to add scrolled class to navbar
+     */
     handleScroll() {
       if (typeof window !== 'undefined') {
         this.hasScrolled = window.scrollY > 50;
       }
+    },
+
+    /**
+     * Fetches travel categories from the API
+     * Handles error cases gracefully
+     */
+    async fetchCategories() {
+      try {
+        const response = await fetch('http://wander-lust.test/api/categories');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const categoriesData = await response.json();
+        
+        // Check if we received valid data
+        if (categoriesData && Array.isArray(categoriesData)) {
+          // Filter out only parent categories (where parent_id is null) if needed
+          this.categories = categoriesData.filter(category => category.parent_id === null);
+          console.log('Categories loaded:', this.categories.length);
+        } else {
+          throw new Error('Invalid data format received from API');
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        // Initialize with empty array when API fails - no fallbacks needed
+        this.categories = [];
+      }
     }
   },
-  mounted() {
+  async mounted() {
+    // Fetch categories when component mounts
+    await this.fetchCategories();
+
+    // Set up event listeners for scroll and escape key
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', this.handleScroll);
 
+      // Allow closing mobile menu with Escape key for accessibility
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && this.isOpen) {
           this.isOpen = false;
@@ -129,6 +292,7 @@ export default defineComponent({
     }
   },
   beforeUnmount() {
+    // Clean up event listeners
     if (typeof window !== 'undefined') {
       window.removeEventListener('scroll', this.handleScroll);
     }
@@ -247,6 +411,10 @@ body {
   margin-right: 16px;
 }
 
+.nav-item {
+  position: relative;
+}
+
 /* Nav link with animated indicator */
 .nav-link {
   position: relative;
@@ -264,6 +432,65 @@ body {
 }
 
 .nav-link.active {
+  color: var(--primary-color);
+}
+
+/* Dropdown styles */
+.nav-link.with-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdown-icon {
+  transition: var(--transition);
+}
+
+.dropdown-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.dropdown-container:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-content {
+  padding: 8px 0;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-accent);
   color: var(--primary-color);
 }
 
@@ -371,6 +598,38 @@ body {
   border-bottom: 1px solid var(--border-color);
   font-weight: 500;
   transition: var(--transition);
+}
+
+.mobile-nav-link.with-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.mobile-dropdown-content {
+  padding-left: 16px;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-dropdown-item {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.mobile-dropdown-item:last-child {
+  border-bottom: none;
+  padding-bottom: 16px;
+}
+
+.mobile-dropdown-item:hover {
+  color: var(--primary-color);
 }
 
 .mobile-nav-link:last-child {
