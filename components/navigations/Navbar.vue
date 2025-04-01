@@ -26,7 +26,7 @@
 
             <!-- Menu item with dropdown -->
             <template v-else>
-              <div class="dropdown-container">
+              <div class="dropdown-container" @mouseleave="handleDropdownLeave">
                 <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link with-dropdown">
                   {{ item.label }}
                   <span class="nav-indicator" v-if="isActive(item.path)"></span>
@@ -112,7 +112,7 @@
                 </a>
               </template>
 
-              <!-- Dropdown for mobile -->
+              <!-- Dropdown for mobile - FIXED HERE -->
               <template v-else>
                 <div class="mobile-dropdown">
                   <div
@@ -137,17 +137,34 @@
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   </div>
-                  <div class="mobile-dropdown-content" v-show="openMobileDropdown === index">
-                    <a
-                        v-for="category in categories"
-                        :key="category.id"
-                        :href="`/packages/category/${category.slug}`"
-                        class="mobile-dropdown-item"
-                        @click="isOpen = false"
-                    >
-                      {{ category.name }}
-                    </a>
-                  </div>
+                  <transition name="expand">
+                    <div class="mobile-dropdown-content" v-show="openMobileDropdown === index">
+                      <template v-for="category in parentCategories" :key="category.id">
+                        <div class="parent-category-container">
+                          <a
+                              :href="`/packages/category/${category.slug}`"
+                              class="mobile-dropdown-item"
+                              @click="isOpen = false"
+                          >
+                            {{ category.name }}
+                          </a>
+                          <transition name="fade">
+                            <div v-if="hasChildren(category.id)" class="mobile-child-categories">
+                              <a
+                                  v-for="child in getChildCategories(category.id)"
+                                  :key="child.id"
+                                  :href="`/packages/category/${child.slug}`"
+                                  class="mobile-dropdown-item child"
+                                  @click="isOpen = false"
+                              >
+                                {{ child.name }}
+                              </a>
+                            </div>
+                          </transition>
+                        </div>
+                      </template>
+                    </div>
+                  </transition>
                 </div>
               </template>
             </template>
@@ -189,31 +206,56 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parent_id: string | null;
+  images: string[];
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface NavItem {
+  label: string;
+  path: string;
+  hasDropdown?: boolean;
+}
+
 export default defineComponent({
+  name: 'Navbar',
+
   data() {
     return {
       isOpen: false,
       hasScrolled: false,
-      openMobileDropdown: null,
-      categories: [],
+      openMobileDropdown: null as number | null,
+      categories: [] as Category[],
+      activeParentId: null as string | null,
       navItems: [
         { label: 'Home', path: '/' },
-        {
-          label: 'Packages',
-          path: '/packages',
-          hasDropdown: true
-        },
+        { label: 'Packages', path: '/packages', hasDropdown: true },
         { label: 'About Us', path: '/about' },
         { label: 'Contact', path: '/contact-us' }
-      ]
+      ] as NavItem[]
     };
   },
+
+  computed: {
+    /**
+     * Returns only parent categories (where parent_id is null)
+     */
+    parentCategories(): Category[] {
+      return this.categories.filter(category => category.parent_id === null);
+    }
+  },
+
   methods: {
     /**
-     * Toggles the mobile menu open/closed state
-     * Also handles body scroll locking when menu is open
+     * Toggles the mobile menu visibility
      */
-    toggleMobileMenu() {
+    toggleMobileMenu(): void {
       this.isOpen = !this.isOpen;
       if (typeof window !== 'undefined') {
         document.body.style.overflow = this.isOpen ? 'hidden' : '';
@@ -221,69 +263,101 @@ export default defineComponent({
     },
 
     /**
-     * Toggles a specific dropdown menu in mobile view
-     * @param {number} index - The index of the dropdown to toggle
+     * Toggles mobile dropdown for a specific index
+     * @param index - The index of the dropdown to toggle
      */
-    toggleMobileDropdown(index) {
-      this.openMobileDropdown = this.openMobileDropdown === index ? null : index;
+    toggleMobileDropdown(index: number): void {
+      if (this.openMobileDropdown === index) {
+        this.openMobileDropdown = null;
+      } else {
+        this.openMobileDropdown = index;
+      }
     },
 
     /**
-     * Checks if the current route matches the given path
-     * @param {string} route - The route path to check
-     * @returns {boolean} - True if current route matches given path
+     * Checks if a given route path is the current active route
+     * @param route - The path to check
+     * @returns boolean - True if the route is active
      */
-    isActive(route) {
+    isActive(route: string): boolean {
       return this.$route && this.$route.path === route;
     },
 
     /**
-     * Handles scroll events to add scrolled class to navbar
+     * Handles scroll events to add/remove scroll class
      */
-    handleScroll() {
+    handleScroll(): void {
       if (typeof window !== 'undefined') {
         this.hasScrolled = window.scrollY > 50;
       }
     },
 
     /**
-     * Fetches travel categories from the API
-     * Handles error cases gracefully
+     * Fetches categories from the API
      */
-    async fetchCategories() {
+    async fetchCategories(): Promise<void> {
       try {
         const response = await fetch('http://wander-lust.test/api/categories');
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const categoriesData = await response.json();
-        
-        // Check if we received valid data
-        if (categoriesData && Array.isArray(categoriesData)) {
-          // Filter out only parent categories (where parent_id is null) if needed
-          this.categories = categoriesData.filter(category => category.parent_id === null);
-          console.log('Categories loaded:', this.categories.length);
+
+        if (Array.isArray(categoriesData)) {
+          this.categories = categoriesData;
+          // console.log('Successfully fetched categories:', this.categories.length);
         } else {
-          throw new Error('Invalid data format received from API');
+          // throw new Error('Invalid categories data format');
         }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
-        // Initialize with empty array when API fails - no fallbacks needed
+        // Initialize with empty categories if fetch fails
         this.categories = [];
       }
+    },
+
+    /**
+     * Checks if a category has child categories
+     * @param categoryId - The ID of the category to check
+     */
+    hasChildren(categoryId: string): boolean {
+      return this.categories.some(category => category.parent_id === categoryId);
+    },
+
+    /**
+     * Gets all child categories for a parent category
+     * @param parentId - The ID of the parent category
+     */
+    getChildCategories(parentId: string): Category[] {
+      return this.categories.filter(category => category.parent_id === parentId);
+    },
+
+    /**
+     * Handles hover on parent category to show submenu
+     * @param categoryId - The ID of the parent category being hovered
+     */
+    handleParentHover(categoryId: string): void {
+      if (this.hasChildren(categoryId)) {
+        this.activeParentId = categoryId;
+      }
+    },
+
+    /**
+     * Handles mouse leave from dropdown to hide submenus
+     */
+    handleDropdownLeave(): void {
+      this.activeParentId = null;
     }
   },
+
   async mounted() {
-    // Fetch categories when component mounts
     await this.fetchCategories();
 
-    // Set up event listeners for scroll and escape key
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', this.handleScroll);
 
-      // Allow closing mobile menu with Escape key for accessibility
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && this.isOpen) {
           this.isOpen = false;
@@ -291,8 +365,8 @@ export default defineComponent({
       });
     }
   },
+
   beforeUnmount() {
-    // Clean up event listeners
     if (typeof window !== 'undefined') {
       window.removeEventListener('scroll', this.handleScroll);
     }
@@ -301,9 +375,9 @@ export default defineComponent({
 </script>
 
 <style>
-/* Base styles and reset */
 :root {
   --primary-color: #ff5e14;
+  --primary-color-rgb: 255, 94, 20;
   --primary-hover: #4338ca;
   --text-color: #1f2937;
   --text-muted: #6b7280;
@@ -330,7 +404,6 @@ body {
   transition: var(--transition);
 }
 
-/* Navbar styles */
 .navbar {
   position: fixed;
   width: 100%;
@@ -443,11 +516,12 @@ body {
 }
 
 .dropdown-icon {
-  transition: var(--transition);
+  transition: transform 0.3s ease;
 }
 
 .dropdown-icon.rotate {
   transform: rotate(180deg);
+  color: var(--primary-color);
 }
 
 .dropdown-container {
@@ -461,13 +535,12 @@ body {
   background-color: var(--bg-color);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-md);
-  min-width: 200px;
+  min-width: 220px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.2s ease;
   z-index: 40;
-  overflow: hidden;
 }
 
 .dropdown-container:hover .dropdown-menu {
@@ -480,8 +553,14 @@ body {
   padding: 8px 0;
 }
 
+.dropdown-item-container {
+  position: relative;
+}
+
 .dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px 16px;
   color: var(--text-color);
   text-decoration: none;
@@ -490,6 +569,51 @@ body {
 }
 
 .dropdown-item:hover {
+  background-color: var(--bg-accent);
+  color: var(--primary-color);
+}
+
+.dropdown-submenu-icon {
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-item:hover .dropdown-submenu-icon {
+  transform: translateX(3px);
+}
+
+.dropdown-submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 200px;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(10px);
+  transition: all 0.2s ease;
+  z-index: 50;
+}
+
+.dropdown-submenu.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.dropdown-subitem {
+  display: block;
+  padding: 10px 16px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.dropdown-subitem:hover {
   background-color: var(--bg-accent);
   color: var(--primary-color);
 }
@@ -504,7 +628,6 @@ body {
   height: 3px;
   background-color: var(--primary-color);
   border-radius: 4px;
-  /* Animation on entry */
   animation: indicator-enter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -608,19 +731,81 @@ body {
 }
 
 .mobile-dropdown-content {
-  padding-left: 16px;
+  padding-left: 0;
   padding-top: 8px;
   display: flex;
   flex-direction: column;
+  border-left: 2px solid var(--border-color);
+  margin-left: 8px;
+}
+
+.mobile-dropdown-content {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.mobile-dropdown-content[v-show="true"] {
+  max-height: 1000px;
+  transition: max-height 0.5s ease-in;
 }
 
 .mobile-dropdown-item {
   color: var(--text-muted);
   text-decoration: none;
-  padding: 12px 0;
+  padding: 12px 16px;
   font-size: 1.1rem;
   border-bottom: 1px solid var(--border-color);
   transition: var(--transition);
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-dropdown-item:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--border-color);
+  margin-right: 12px;
+  transition: var(--transition);
+}
+
+.mobile-dropdown-item:hover:before {
+  background-color: var(--primary-color);
+}
+
+.mobile-child-categories {
+  padding-left: 0;
+  margin-left: 16px;
+  border-left: 2px solid var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.mobile-dropdown-item.child {
+  font-size: 0.95rem;
+  padding: 10px 16px;
+  color: var(--text-color);
+  position: relative;
+  opacity: 0.8;
+  border-bottom: none;
+}
+
+.mobile-dropdown-item.child:before {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary-color);
+  opacity: 0.5;
+}
+
+.mobile-dropdown-item.child:hover {
+  opacity: 1;
+  background-color: rgba(var(--primary-color-rgb, 255, 94, 20), 0.05);
+}
+
+.mobile-dropdown-item.child:hover:before {
+  opacity: 1;
 }
 
 .mobile-dropdown-item:last-child {
@@ -699,13 +884,32 @@ body {
   transform: translateX(100%);
 }
 
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  max-height: 1000px;
+  opacity: 1;
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: translateX(-10px);
 }
 </style>
