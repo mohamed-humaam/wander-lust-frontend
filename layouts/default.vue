@@ -16,7 +16,14 @@
 </template>
 
 <script>
+import Navbar from '/components/navigations/navbar.vue';
+import Footer from '/components/navigations/footer.vue';
+
 export default {
+  components: {
+    Navbar,
+    Footer
+  },
   data() {
     return {
       scrollPosition: 0
@@ -57,7 +64,6 @@ export default {
 </script>
 
 <style>
-/* Base layout */
 .layout {
   font-family: Arial, sans-serif;
   display: flex;
@@ -87,7 +93,6 @@ footer {
   z-index: 0;
 }
 
-/* Media query to match navbar.vue responsive breakpoint */
 @media (min-width: 768px) {
   .main-content {
     padding-top: var(--nav-height);
