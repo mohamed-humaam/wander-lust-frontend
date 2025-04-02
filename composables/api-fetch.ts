@@ -96,3 +96,12 @@ export function useGetResourceWithRelations(
 
     return useApiFetch(`/${resource}`, { query: relationQuery }).data;
 }
+
+const packages = useGetResourceWithRelations("packages", {}, [
+    "category",
+    "location",
+    "amenities",
+    "rooms",
+    "activities",
+    "features"
+]);
