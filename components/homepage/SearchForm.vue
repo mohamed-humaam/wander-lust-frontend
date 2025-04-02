@@ -27,7 +27,7 @@
               autocomplete="off"
           >
           <div
-              v-if="showLocationSuggestions && locationSuggestions.length"
+              v-if="showLocationSuggestions && locationSuggestions.length > 0"
               class="location-suggestions"
               @mousedown.prevent
           >
@@ -284,15 +284,28 @@ const incrementRooms = () => searchData.value.rooms < 5 && searchData.value.room
 const decrementRooms = () => searchData.value.rooms > 1 && searchData.value.rooms--
 
 const searchLocations = () => {
-  locationSuggestions.value = searchedLocations.value?.data
-      ?.map(location => location.name)
-      ?.filter(name => name.toLowerCase().includes(searchData.value.location.toLowerCase()))
-      ?.slice(0, 5) || []
+  // Check if data exists and handle both possible response structures
+  if (!searchedLocations.value) {
+    locationSuggestions.value = [];
+    return;
+  }
+
+  // Handle the case where the API response is directly an array
+  const locationsData = Array.isArray(searchedLocations.value)
+      ? searchedLocations.value
+      : (searchedLocations.value.data || []);
+
+  locationSuggestions.value = locationsData
+      .filter(location => location && location.name &&
+          location.name.toLowerCase().includes(searchData.value.location.toLowerCase()))
+      .map(location => location.name)
+      .slice(0, 5);
 }
 
 const selectLocation = (location) => {
-  searchData.value.location = location
-  showLocationSuggestions.value = false
+  console.log("Selecting location:", location);
+  searchData.value.location = location;
+  showLocationSuggestions.value = false;
 }
 
 const performSearch = () => {
@@ -306,10 +319,10 @@ const performSearch = () => {
 const locationInput = ref(null)
 
 const handleLocationBlur = () => {
-  // Use setTimeout to allow click events to process before closing
+  // Increase timeout to ensure dropdown stays visible long enough for clicks
   setTimeout(() => {
-    showLocationSuggestions.value = false
-  }, 200)
+    showLocationSuggestions.value = false;
+  }, 300);
 }
 
 const handleClickOutside = (event) => {
