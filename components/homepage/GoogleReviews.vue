@@ -219,7 +219,7 @@ const error = ref(null);
 const activeIndex = ref(0);
 const expanded = ref({});
 const liked = ref({});
-const placeId = "ChIJ25kQEjx_PzsRcKVFYNO88cQ";
+const placeId = "ChIJQ3qJKAChtSQRCkMUtiwrgoU";
 const activeFilter = ref(0); // 0 means all reviews, 1-5 for specific star ratings
 
 // Carousel state
