@@ -1,4 +1,4 @@
-<!-- pages/packages/index.vue -->
+// Todo: add filters like locations and price range
 <template>
   <div class="packages-page">
     <!-- Header with Background Image Carousel -->
