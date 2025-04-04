@@ -9,74 +9,74 @@ export function useApiFetch<T>(path: string, options?: UseFetchOptions<T>) {
 
 // Users
 export function useGetUsers(query?: Record<string, string | number>) {
-    return useApiFetch("/users", { query }).data;
+    return useApiFetch("/users", { query });
 }
 
 export function useGetUser(id: string | number) {
-    return useApiFetch(`/users/${id}`).data;
+    return useApiFetch(`/users/${id}`);
 }
 
 // Locations
 export function useGetLocations(query?: Record<string, string>) {
-    return useApiFetch("/locations", { query }).data;
+    return useApiFetch("/locations", { query });
 }
 
 export function useGetLocation(id: string | number) {
-    return useApiFetch(`/locations/${id}`).data;
+    return useApiFetch(`/locations/${id}`);
 }
 
 // Categories
 export function useGetCategories(query?: Record<string, string>) {
-    return useApiFetch("/categories", { query }).data;
+    return useApiFetch("/categories", { query });
 }
 
 export function useGetCategory(id: string | number) {
-    return useApiFetch(`/categories/${id}`).data;
+    return useApiFetch(`/categories/${id}`);
 }
 
 // Packages
 export function useGetPackages(query?: Record<string, string>) {
-    return useApiFetch("/packages", { query }).data;
+    return useApiFetch("/packages", { query });
 }
 
 export function useGetPackage(id: string | number) {
-    return useApiFetch(`/packages/${id}`).data;
+    return useApiFetch(`/packages/${id}`);
 }
 
 // Amenities
 export function useGetAmenities(query?: Record<string, string>) {
-    return useApiFetch("/amenities", { query }).data;
+    return useApiFetch("/amenities", { query });
 }
 
 export function useGetAmenity(id: string | number) {
-    return useApiFetch(`/amenities/${id}`).data;
+    return useApiFetch(`/amenities/${id}`);
 }
 
 // Rooms
 export function useGetRooms(query?: Record<string, string>) {
-    return useApiFetch("/rooms", { query }).data;
+    return useApiFetch("/rooms", { query });
 }
 
 export function useGetRoom(id: string | number) {
-    return useApiFetch(`/rooms/${id}`).data;
+    return useApiFetch(`/rooms/${id}`);
 }
 
 // Activities
 export function useGetActivities(query?: Record<string, string>) {
-    return useApiFetch("/activities", { query }).data;
+    return useApiFetch("/activities", { query });
 }
 
 export function useGetActivity(id: string | number) {
-    return useApiFetch(`/activities/${id}`).data;
+    return useApiFetch(`/activities/${id}`);
 }
 
 // Features
 export function useGetFeatures(query?: Record<string, string>) {
-    return useApiFetch("/features", { query }).data;
+    return useApiFetch("/features", { query });
 }
 
 export function useGetFeature(id: string | number) {
-    return useApiFetch(`/features/${id}`).data;
+    return useApiFetch(`/features/${id}`);
 }
 
 // Ping API
@@ -94,7 +94,7 @@ export function useGetResourceWithRelations(
         { ...query, with: relations.join(',') } :
         query;
 
-    return useApiFetch(`/${resource}`, { query: relationQuery }).data;
+    return useApiFetch(`/${resource}`, { query: relationQuery });
 }
 
 export const usePackages = () => {
