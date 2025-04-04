@@ -35,14 +35,14 @@
     <!-- Packages Grid -->
     <ClientOnly>
       <div class="packages-container">
-        <template v-if="!pending && packages && packages.length">
+        <template v-if="status!=='pending' && packages && packages.length">
           <ProductCard
               v-for="pkg in packages"
               :key="pkg?.id || index"
               :packageData="pkg"
           />
         </template>
-        <div v-else-if="pending" class="loading">
+        <div v-else-if="status==='pending'" class="loading">
           Loading packages...
         </div>
         <div v-else class="no-packages">
@@ -58,9 +58,9 @@ import ProductCard from '~/components/packages/ProductCard.vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 // Fetch packages data
-const { data: packages, pending, error } = await useAsyncData('packages', () =>
-    usePackages()
-);
+const { data: packages, status, error } = await usePackages();
+
+// console.log(packages.value)
 
 // Add error handling
 if (error.value) {
