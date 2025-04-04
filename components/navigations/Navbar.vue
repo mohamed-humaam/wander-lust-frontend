@@ -18,10 +18,10 @@
           <li v-for="(item, index) in navItems" :key="index" class="nav-item">
             <!-- Regular menu item without dropdown -->
             <template v-if="!item.hasDropdown">
-              <a :href="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link">
+              <NuxtLink :to="item.path" :class="{ 'active': isActive(item.path) }" class="nav-link">
                 {{ item.label }}
                 <span class="nav-indicator" v-if="isActive(item.path)"></span>
-              </a>
+              </NuxtLink>
             </template>
 
             <!-- Menu item with dropdown -->
