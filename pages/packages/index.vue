@@ -225,10 +225,10 @@ onBeforeUnmount(() => {
 
 /* Packages Container */
 .packages-container {
-  padding: 1rem 2rem;
+  padding: 1rem 3rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: 30px;
 }
 
 .loading {
@@ -237,77 +237,36 @@ onBeforeUnmount(() => {
   grid-column: 1 / -1;
 }
 
-.no-packages {
+.loading, .no-packages {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem 1rem;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   grid-column: 1 / -1;
-  color: #666;
-  font-style: italic;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .packages-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
   .header-content h1 {
-    font-size: 1.8rem;
-  }
-
-  .image-controls {
-    bottom: 5px;
-  }
-
-  .control-btn {
-    width: 25px;
-    height: 25px;
-    font-size: 0.7rem;
-  }
-
-  .image-indicators span {
-    width: 8px;
-    height: 8px;
-  }
-
-  /* Mobile grid - 2 columns */
-  .packages-container {
-    grid-template-columns: repeat(2, minmax(140px, 1fr));
-    gap: 15px;
+    font-size: 2rem;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  /* Tablet grid - 3 columns */
-  .packages-container {
-    grid-template-columns: repeat(3, minmax(200px, 1fr));
-  }
-}
-
-@media (min-width: 1025px) and (max-width: 1440px) {
-  /* Small desktop grid - 4 columns */
-  .packages-container {
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
-  }
-}
-
-@media (min-width: 1441px) {
-  /* Large desktop grid - 5 columns */
-  .packages-container {
-    grid-template-columns: repeat(5, minmax(250px, 1fr));
-  }
-}
-
-/* Extra small devices (phones, 480px and down) */
 @media (max-width: 480px) {
   .packages-container {
-    padding: 0rem 1rem;
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
-    gap: 12px;
-  }
-
-  .header-container {
-    height: 160px;
+    grid-template-columns: 1fr;
   }
 
   .header-content h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
   }
 }
 </style>
