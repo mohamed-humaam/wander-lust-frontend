@@ -1,4 +1,5 @@
 <template>
+  <ClientOnly>
   <div class="package-detail-container" v-if="packageData">
     <!-- Hero Section with Image Gallery -->
     <div class="gallery-container">
@@ -305,24 +306,24 @@
     </div>
 
     <!-- Similar Packages Section -->
-    <section class="similar-packages-section">
-      <div class="container">
-        <h2 class="section-title">You May Also Like</h2>
-        <div class="similar-packages-grid">
-          <!-- This would be populated with actual similar packages -->
-          <div class="similar-package-card" v-for="i in 3" :key="i">
-            <div class="similar-package-img"></div>
-            <div class="similar-package-content">
-              <h3>Similar Package {{ i }}</h3>
-              <p>Explore more amazing destinations similar to {{ packageData.name }}.</p>
-              <div class="similar-package-price">
-                <span>From ${{ (parseInt(packageData.price) - 50 + (i * 30)).toFixed(2) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<!--    <section class="similar-packages-section">-->
+<!--      <div class="container">-->
+<!--        <h2 class="section-title">You May Also Like</h2>-->
+<!--        <div class="similar-packages-grid">-->
+<!--          &lt;!&ndash; This would be populated with actual similar packages &ndash;&gt;-->
+<!--          <div class="similar-package-card" v-for="i in 3" :key="i">-->
+<!--            <div class="similar-package-img"></div>-->
+<!--            <div class="similar-package-content">-->
+<!--              <h3>Similar Package {{ i }}</h3>-->
+<!--              <p>Explore more amazing destinations similar to {{ packageData.name }}.</p>-->
+<!--              <div class="similar-package-price">-->
+<!--                <span>From ${{ (parseInt(packageData.price) - 50 + (i * 30)).toFixed(2) }}</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </section>-->
   </div>
 
   <!-- Loading State -->
@@ -330,10 +331,11 @@
     <div class="loading-spinner"></div>
     <p>Loading package details...</p>
   </div>
+  </ClientOnly>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation as SwiperNavigation, Pagination as SwiperPagination, Autoplay as SwiperAutoplay } from 'swiper/modules';
@@ -357,7 +359,24 @@ const { data, pending, error } = useGetResourceWithRelations(
 // Watch for data changes
 watchEffect(() => {
   if (data.value) {
-    packageData.value = Array.isArray(data.value) ? data.value[0] : data.value;
+    // Filter the data to get only the package with matching ID
+    const filteredPackage = Array.isArray(data.value)
+        ? data.value.find(pkg => pkg.id == packageId)
+        : (data.value.id == packageId ? data.value : null);
+
+    if (filteredPackage) {
+      packageData.value = filteredPackage;
+      console.log('Filtered Package Data:', filteredPackage); // Add this line
+    } else {
+      console.error('Package not found with ID:', packageId);
+      console.log('All Packages Data:', data.value); // Show all data if not found
+      // Handle case where package isn't found
+    }
+    isLoading.value = false;
+  }
+
+  if (error.value) {
+    console.error('Error fetching package:', error.value);
     isLoading.value = false;
   }
 });
@@ -401,7 +420,7 @@ const handleImageError = (event) => {
 };
 
 const handleIconError = (event) => {
-  event.target.src = '/assets/images/placeholder/icon.png';
+  event.target.src = '/assets/images/placeholder/img.png';
 };
 
 const formatPrice = (price) => {
