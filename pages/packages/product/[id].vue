@@ -282,9 +282,9 @@
             </div>
             <h4>Need Assistance?</h4>
             <p>Our travel experts are ready to help you plan your perfect journey.</p>
-            <a href="tel:+18001234567" class="assistance-contact">+1 (800) 123-4567</a>
+            <a href="tel:+9603336796" class="assistance-contact">+960 333-6796</a>
             <div class="assistance-email">
-              <a href="mailto:info@wanderlust.com">info@wanderlust.com</a>
+              <a href="mailto:reservations@wanderlust.com">reservations@wanderlust.com</a>
             </div>
           </div>
 
