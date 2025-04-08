@@ -40,6 +40,8 @@
               v-for="pkg in packages"
               :key="pkg?.id || index"
               :packageData="pkg"
+              @view-details="navigateToPackageDetail"
+              @book-now="bookPackage"
           />
         </template>
         <div v-else-if="status==='pending'" class="loading">
@@ -56,11 +58,13 @@
 <script setup>
 import ProductCard from '~/components/packages/ProductCard.vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Router setup for navigation
+const router = useRouter();
 
 // Fetch packages data
 const { data: packages, status, error } = await usePackages();
-
-// console.log(packages.value)
 
 // Add error handling
 if (error.value) {
@@ -103,6 +107,26 @@ function setImage(index) {
   // Reset the interval when manually changing image
   clearInterval(carouselInterval);
   startCarousel();
+}
+
+// Handle navigation to package detail page
+function navigateToPackageDetail(packageId) {
+  if (packageId) {
+    router.push(`/packages/${packageId}`);
+  } else {
+    console.error('No package ID provided for navigation');
+  }
+}
+
+// Handle booking package
+function bookPackage(packageId) {
+  if (packageId) {
+    // This could either navigate to a booking page or show a modal
+    console.log(`Booking package with ID: ${packageId}`);
+    alert(`Thank you for booking. Package ID: ${packageId}`);
+    // Alternatively, you could navigate to a booking page:
+    // router.push(`/booking/${packageId}`);
+  }
 }
 
 // Lifecycle hooks
