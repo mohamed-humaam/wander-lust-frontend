@@ -155,6 +155,10 @@ const props = defineProps({
   highlights: {
     type: Array,
     default: () => []
+  },
+  packageName: {
+    type: String,
+    required: true
   }
 });
 
@@ -171,7 +175,47 @@ const formatPrice = (price) => {
   });
 };
 
+const formatDateForMessage = (dateString) => {
+  if (!dateString) return 'not specified';
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  } catch (e) {
+    console.error('Error formatting date:', e);
+    return dateString;
+  }
+};
+
 const handleReserve = () => {
+  // Check if travel date is selected
+  if (!travelDate.value) {
+    alert('Please select a travel date before reserving.');
+    return;
+  }
+
+  // Format date for the message
+  const formattedDate = formatDateForMessage(travelDate.value);
+
+  // Get the guest text (singular or plural)
+  const guestText = parseInt(guestCount.value) === 1
+      ? '1 guest'
+      : `${guestCount.value} guests`;
+
+  // Construct WhatsApp message
+  const message = `Hi, I would like to book the ${props.packageName} for ${guestText} on ${formattedDate}.... Could you please assist me with the booking details and next steps? Looking forward to your response. Thank you!`;
+
+  // Create WhatsApp URL with phone number and encoded message
+  const whatsappUrl = `https://wa.me/9607263030?text=${encodeURIComponent(message)}`;
+
+  // Open WhatsApp in a new tab
+  window.open(whatsappUrl, '_blank');
+
+  // Still emit the reserve event for any additional functionality
   emit('reserve', {
     date: travelDate.value,
     guests: guestCount.value

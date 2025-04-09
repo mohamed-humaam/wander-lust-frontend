@@ -72,6 +72,7 @@
                 :location-name="packageData.location?.name"
                 :category="packageData.category?.name"
                 :highlights="packageData.features?.map(f => f.name)"
+                :package-name="packageData.name"
                 @reserve="reservePackage"
                 @inquire="inquireAboutPackage"
             />
@@ -161,7 +162,9 @@ const handleImageError = (event) => {
 
 // Action functions
 const reservePackage = (bookingDetails) => {
-  alert(`Thank you for reserving ${packageData.value?.name}. We'll contact you shortly to confirm your booking.`);
+  // This function is still kept for compatibility,
+  // but the main action now happens in the BookingCard component
+  console.log('Booking details received:', bookingDetails);
 };
 
 const inquireAboutPackage = () => {
