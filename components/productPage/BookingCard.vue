@@ -401,6 +401,19 @@ const handleInquire = () => {
   font-size: 0.95rem;
 }
 
+.assistance-contact,
+.assistance-email a {
+  text-decoration: none;
+  color: #1F2937;
+}
+
+.assistance-contact:hover,
+.assistance-email a:hover {
+  text-decoration: none;
+  color: #FF5E14;
+  transition: 0.3s ease;
+}
+
 /* Highlights Card */
 .highlights-card {
   background-color: var(--background-white);
