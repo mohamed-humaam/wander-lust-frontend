@@ -102,8 +102,9 @@ const handleImageError = (event) => {
   background-color: var(--background-white, #ffffff);
   border-radius: var(--radius-lg, 12px);
   box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1));
-  padding: 2rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem;
+  height: auto;
+  min-height: 0;
   overflow: hidden;
 }
 
