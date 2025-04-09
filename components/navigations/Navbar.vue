@@ -236,7 +236,7 @@ export default defineComponent({
       navItems: [
         { label: 'Home', path: '/' },
         { label: 'Packages', path: '/packages', hasDropdown: true },
-        { label: 'About Us', path: '/about' },
+        // { label: 'About Us', path: '/about' },
         { label: 'Contact', path: '/contact-us' }
       ] as NavItem[]
     };

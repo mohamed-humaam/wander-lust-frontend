@@ -1,15 +1,26 @@
 <template>
   <div>
-    <h2>CONTACT US</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore eligendi ipsa vero? A accusamus adipisci dolore eius exercitationem facilis in ipsam, itaque modi, nihil nostrum quae quidem sit tempore velit!</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid amet aspernatur cumque cupiditate dolor dolores dolorum illo impedit, laboriosam molestias natus, nobis odio odit quidem suscipit totam ullam ut, veniam?</p>
+    <PageTitle pageTitle="Contact" />
+    <ContactDetails />
   </div>
 </template>
 
 <script>
+import ContactDetails from "~/components/contactPage/Contact";
 export default {
-
-}
+  name: "contact",
+  components: {
+    // Navbar,
+    // PageTitle,
+    ContactDetails,
+    // Footer,
+  },
+  // head() {
+  //   return {
+  //     title: "CODIUX | Contact",
+  //   };
+  // },
+};
 </script>
 
 <style scoped>
