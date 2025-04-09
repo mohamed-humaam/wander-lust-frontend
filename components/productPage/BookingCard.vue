@@ -114,7 +114,7 @@
     <p>Our travel experts are ready to help you plan your perfect journey.</p>
     <a href="tel:+9603336796" class="assistance-contact">+960 333-6796</a>
     <div class="assistance-email">
-      <a href="mailto:reservations@wanderlust.com">reservations@wanderlust.com</a>
+      <a href="mailto:reservations@wanderlustadventuresmv.com">reservations@wanderlustadventuresmv.com</a>
     </div>
   </div>
 
