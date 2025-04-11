@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import Navbar from '/components/navigations/navbar.vue';
-import Footer from '/components/navigations/footer.vue';
+import Navbar from '@/components/navigations/navbar.vue';
+import Footer from '@/components/navigations/footer.vue';
 
 export default {
   components: {
