@@ -34,5 +34,9 @@ export default defineNuxtConfig({
         },
     },
 
+    server: {
+        allowedHosts: ['wanderlustadventuresmv.com'],
+    },
+    
     compatibilityDate: "2025-03-22",
 })
