@@ -623,5 +623,17 @@ main {
   z-index: inherit;
 }
 </style>
-<script setup lang="ts">
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'Footer',
+
+  data() {
+    return {
+      currentYear: new Date().getFullYear()
+    };
+  }
+});
 </script>
