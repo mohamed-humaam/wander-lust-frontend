@@ -1,23 +1,18 @@
 <template>
   <div class="layout">
-    <!-- Navbar at the top -->
-    <Navbar ref="navbar" />
-
-    <!-- Main content area -->
+    <Navbar />
     <div class="content-wrapper">
-      <main class="main-content" ref="mainContent">
+      <main class="main-content">
         <slot />
       </main>
-
-      <!-- Footer at the bottom -->
       <Footer />
     </div>
   </div>
 </template>
 
 <script>
-import Navbar from '@/components/navigations/navbar.vue';
-import Footer from '@/components/navigations/footer.vue';
+import Navbar from '/components/navigations/navbar.vue';
+import Footer from '/components/navigations/footer.vue';
 
 export default {
   components: {
