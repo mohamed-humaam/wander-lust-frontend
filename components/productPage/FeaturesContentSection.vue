@@ -38,7 +38,7 @@ defineProps({
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '/assets/images/placeholder/img.png';
   if (imagePath.startsWith('http')) return imagePath;
-  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'http://wander-lust.test';
+  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'http://admin.wanderlustadventuresmv.com';
   return `${apiBaseUrl}/${imagePath.startsWith('/') ? imagePath.slice(1) : imagePath}`;
 };
 

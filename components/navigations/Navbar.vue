@@ -297,7 +297,7 @@ export default defineComponent({
      */
     async fetchCategories(): Promise<void> {
       try {
-        const response = await fetch('http://wander-lust.test/api/categories');
+        const response = await fetch('http://admin.wanderlustadventuresmv.com/api/categories');
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
