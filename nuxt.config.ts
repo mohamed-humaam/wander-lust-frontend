@@ -29,7 +29,7 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://admin.wanderlustadventuresmv.com/api',
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://admin.wanderlustadventuresmv.com/api',
             googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY
         },
     },
