@@ -12,27 +12,31 @@
               <div class="text">
                 <p>Wanderlust Adventures, based in Addu, offers personalized inbound and outbound travel experiences. We specialize in creating unforgettable journeys to the Maldives and global destinations, turning your wanderlust into lasting memories.</p>
               </div>
-              <ul class="footer-social">
-                <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                <li><a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a></li>
-                <li><a href="#" aria-label="Vimeo"><i class="fab fa-vimeo-v"></i></a></li>
-                <li><a href="#" aria-label="Google Plus"><i class="fab fa-google-plus-g"></i></a></li>
-              </ul>
+              <!--              <ul class="footer-social">-->
+              <!--                <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>-->
+              <!--                <li><a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a></li>-->
+              <!--                <li><a href="#" aria-label="Vimeo"><i class="fab fa-vimeo-v"></i></a></li>-->
+              <!--                <li><a href="#" aria-label="Google Plus"><i class="fab fa-google-plus-g"></i></a></li>-->
+              <!--              </ul>-->
             </div>
           </div>
 
           <div class="col-lg-7 col-md-12 col-sm-12">
             <div class="row">
-              <!-- Services Column -->
+              <!-- Packages Column (Replacing Services) -->
               <div class="col-lg-6 col-md-6 col-sm-12 footer-column">
                 <div class="service-widget footer-widget">
-                  <div class="footer-title">Services</div>
+                  <div class="footer-title">Packages</div>
                   <ul class="list">
-                    <li><a href="#">Water Surve</a></li>
-                    <li><a href="#">Education for all</a></li>
-                    <li><a href="#">Food Serving</a></li>
-                    <li><a href="#">Animal Saves</a></li>
-                    <li><a href="#">Help Orphan</a></li>
+                    <li v-for="category in parentCategories" :key="category.id">
+                      <a :href="`/packages/category/${category.slug}`">{{ category.name }}</a>
+                      <!-- Child categories sublist -->
+                      <ul v-if="hasChildren(category.id)" class="child-categories">
+                        <li v-for="child in getChildCategories(category.id)" :key="child.id">
+                          <a :href="`/packages/category/${child.slug}`">{{ child.name }}</a>
+                        </li>
+                      </ul>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -339,7 +343,7 @@ ul {
   background: var(--primary-color);
 }
 
-/* Services List */
+/* Services/Packages List */
 .service-widget .list {
   position: relative;
   z-index: 10;
@@ -377,6 +381,25 @@ ul {
 }
 
 .service-widget .list li a:hover:before {
+  opacity: 1;
+}
+
+/* Child categories styling */
+.child-categories {
+  margin-left: 20px;
+  margin-top: 8px;
+}
+
+.child-categories li {
+  margin-bottom: 8px;
+}
+
+.child-categories li a {
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+.child-categories li a:hover {
   opacity: 1;
 }
 
@@ -505,6 +528,11 @@ ul {
     padding-left: 0;
   }
 
+  .child-categories {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
   .contact-widget .text {
     padding-left: 0;
     text-align: center;
@@ -627,13 +655,82 @@ main {
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parent_id: string | null;
+  images: string[];
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default defineComponent({
   name: 'Footer',
 
   data() {
     return {
-      currentYear: new Date().getFullYear()
+      currentYear: new Date().getFullYear(),
+      categories: [] as Category[]
     };
+  },
+
+  computed: {
+    /**
+     * Returns only parent categories (where parent_id is null)
+     */
+    parentCategories(): Category[] {
+      return this.categories.filter(category => category.parent_id === null);
+    }
+  },
+
+  methods: {
+    /**
+     * Checks if a category has child categories
+     * @param categoryId - The ID of the category to check
+     */
+    hasChildren(categoryId: string): boolean {
+      return this.categories.some(category => category.parent_id === categoryId);
+    },
+
+    /**
+     * Gets all child categories for a parent category
+     * @param parentId - The ID of the parent category
+     */
+    getChildCategories(parentId: string): Category[] {
+      return this.categories.filter(category => category.parent_id === parentId);
+    },
+
+    /**
+     * Fetches categories from the API
+     */
+    async fetchCategories(): Promise<void> {
+      try {
+        const response = await fetch('https://admin.wanderlustadventuresmv.com/api/categories');
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const categoriesData = await response.json();
+
+        if (Array.isArray(categoriesData)) {
+          this.categories = categoriesData;
+        } else {
+          // Initialize with empty categories if data format is invalid
+          this.categories = [];
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        // Initialize with empty categories if fetch fails
+        this.categories = [];
+      }
+    }
+  },
+
+  async mounted() {
+    await this.fetchCategories();
   }
 });
 </script>
