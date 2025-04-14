@@ -10,7 +10,7 @@
                 <img src="/assets/logo/footer-logo.svg" alt="WanderLust" width="auto" height="35">
               </div>
               <div class="text">
-                <p>Lorem ipsum dolor amet consectetur adi pisicing elit sed eiusm tempor incididunt ut labore dolore magna aliqua enim ad minim veniam quis.nostrud exercita.laboris nisi ut aliquip ea commodo conse quatuis aute irure.</p>
+                <p>Wanderlust Adventures, based in Addu, offers personalized inbound and outbound travel experiences. We specialize in creating unforgettable journeys to the Maldives and global destinations, turning your wanderlust into lasting memories.</p>
               </div>
               <ul class="footer-social">
                 <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
