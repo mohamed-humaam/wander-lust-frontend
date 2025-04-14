@@ -60,7 +60,7 @@ export default {
       ],
       currentTranslate: 0,
       animationFrame: null,
-      whatsappNumber: '+9607263030', // Replace with your actual WhatsApp number
+      whatsappNumber: '+9607213030', // Replace with your actual WhatsApp number
       whatsappMessage: 'Hello! I would like to book a flight.'
     }
   },
