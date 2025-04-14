@@ -1,6 +1,7 @@
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const placeId = query.placeId;
+    const config = useRuntimeConfig();
 
     if (!placeId) {
         return {
@@ -8,7 +9,15 @@ export default defineEventHandler(async (event) => {
         };
     }
 
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    // Use the API key from runtime config
+    const apiKey = config.public.googleMapsApiKey;
+
+    if (!apiKey) {
+        return {
+            error: 'Google Maps API key is not configured'
+        };
+    }
+
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews,photos&key=${apiKey}`;
 
     try {
