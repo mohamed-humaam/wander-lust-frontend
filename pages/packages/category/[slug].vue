@@ -15,7 +15,7 @@
         >
           <div class="category-overlay">
             <h1>{{ category.name }}</h1>
-            <p class="category-description" v-html="category.description"></p>
+<!--            <p class="category-description" v-html="category.description"></p>-->
           </div>
         </div>
 
