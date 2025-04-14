@@ -135,8 +135,9 @@ const categoryBackgroundStyle = computed(() => {
     }
 
     let cleanPath = imagePath;
-    if (cleanPath.startsWith('storage/')) {
-      cleanPath = cleanPath.replace('storage/', '');
+    // Make sure the path doesn't already have "storage/" at the beginning
+    if (!cleanPath.startsWith('storage/')) {
+      cleanPath = `storage/${cleanPath}`;
     }
 
     if (cleanPath.startsWith('/')) {
