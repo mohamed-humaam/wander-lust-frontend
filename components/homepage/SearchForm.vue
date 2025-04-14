@@ -244,7 +244,9 @@ const searchData = ref({
   rooms: 1
 })
 
-const searchedLocations = useGetLocations({search: computed(() => searchData.value.location)})
+const { data: searchedLocations } = useGetLocations({
+  search: computed(() => searchData.value.location)
+})
 
 // Computed properties
 const travellerSummary = computed(() => {
@@ -284,28 +286,23 @@ const incrementRooms = () => searchData.value.rooms < 5 && searchData.value.room
 const decrementRooms = () => searchData.value.rooms > 1 && searchData.value.rooms--
 
 const searchLocations = () => {
-  // Check if data exists and handle both possible response structures
-  if (!searchedLocations.value) {
-    locationSuggestions.value = [];
-    return;
+  if (!searchData.value.location || searchData.value.location.length < 2) {
+    locationSuggestions.value = []
+    return
   }
 
-  // Handle the case where the API response is directly an array
-  const locationsData = Array.isArray(searchedLocations.value)
-      ? searchedLocations.value
-      : (searchedLocations.value.data || []);
+  showLocationSuggestions.value = true
 
-  locationSuggestions.value = locationsData
-      .filter(location => location && location.name &&
-          location.name.toLowerCase().includes(searchData.value.location.toLowerCase()))
+  // The API response is already being filtered by the search term in the composable
+  // Just map the results to their names
+  locationSuggestions.value = (searchedLocations.value || [])
       .map(location => location.name)
-      .slice(0, 5);
+      .slice(0, 5)
 }
 
 const selectLocation = (location) => {
-  console.log("Selecting location:", location);
-  searchData.value.location = location;
-  showLocationSuggestions.value = false;
+  searchData.value.location = location
+  showLocationSuggestions.value = false
 }
 
 const performSearch = () => {
@@ -321,8 +318,8 @@ const locationInput = ref(null)
 const handleLocationBlur = () => {
   // Increase timeout to ensure dropdown stays visible long enough for clicks
   setTimeout(() => {
-    showLocationSuggestions.value = false;
-  }, 300);
+    showLocationSuggestions.value = false
+  }, 200)
 }
 
 const handleClickOutside = (event) => {
