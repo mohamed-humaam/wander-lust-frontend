@@ -463,7 +463,7 @@ ul {
 
 .footer-bottom .footer-nav {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 20px;
 }
 
