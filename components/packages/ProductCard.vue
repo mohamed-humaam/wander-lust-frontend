@@ -224,7 +224,7 @@ const getImageUrl = (imagePath) => {
   }
 
   // Safe environment check for API base URL
-  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'http://admin.wanderlustadventuresmv.com';
+  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'https://admin.wanderlustadventuresmv.com';
   return `${apiBaseUrl}/${imagePath.startsWith('/') ? imagePath.slice(1) : imagePath}`;
 };
 

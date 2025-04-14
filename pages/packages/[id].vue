@@ -152,7 +152,7 @@ const getImageUrl = (imagePath) => {
   }
 
   const cleanPath = imagePath;
-  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'http://admin.wanderlustadventuresmv.com';
+  const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || 'https://admin.wanderlustadventuresmv.com';
   return `${apiBaseUrl}/${cleanPath.startsWith('/') ? cleanPath.slice(1) : cleanPath}`;
 };
 
