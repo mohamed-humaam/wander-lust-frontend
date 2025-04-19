@@ -36,9 +36,9 @@
                 </a>
                 <div class="dropdown-menu">
                   <div class="dropdown-content">
-                    <div v-for="category in parentCategories" :key="category.id" class="dropdown-item-container">
+                    <div v-for="category in getRelevantCategories(item.categoryType)" :key="category.id" class="dropdown-item-container">
                       <a
-                          :href="`/packages/category/${category.slug}`"
+                          :href="`/${item.categoryType}/category/${category.slug}`"
                           class="dropdown-item"
                           @mouseenter="handleParentHover(category.id)"
                       >
@@ -69,7 +69,7 @@
                         <a
                             v-for="child in getChildCategories(category.id)"
                             :key="child.id"
-                            :href="`/packages/category/${child.slug}`"
+                            :href="`/${item.categoryType}/category/${child.slug}`"
                             class="dropdown-subitem"
                         >
                           {{ child.name }}
@@ -112,7 +112,7 @@
                 </a>
               </template>
 
-              <!-- Dropdown for mobile - FIXED HERE -->
+              <!-- Dropdown for mobile -->
               <template v-else>
                 <div class="mobile-dropdown">
                   <div
@@ -139,10 +139,10 @@
                   </div>
                   <transition name="expand">
                     <div class="mobile-dropdown-content" v-show="openMobileDropdown === index">
-                      <template v-for="category in parentCategories" :key="category.id">
+                      <template v-for="category in getRelevantCategories(item.categoryType)" :key="category.id">
                         <div class="parent-category-container">
                           <a
-                              :href="`/packages/category/${category.slug}`"
+                              :href="`/${item.categoryType}/category/${category.slug}`"
                               class="mobile-dropdown-item"
                               @click="isOpen = false"
                           >
@@ -153,7 +153,7 @@
                               <a
                                   v-for="child in getChildCategories(category.id)"
                                   :key="child.id"
-                                  :href="`/packages/category/${child.slug}`"
+                                  :href="`/${item.categoryType}/category/${child.slug}`"
                                   class="mobile-dropdown-item child"
                                   @click="isOpen = false"
                               >
@@ -221,6 +221,7 @@ interface NavItem {
   label: string;
   path: string;
   hasDropdown?: boolean;
+  categoryType?: string;
 }
 
 export default defineComponent({
@@ -235,7 +236,8 @@ export default defineComponent({
       activeParentId: null as string | null,
       navItems: [
         { label: 'Home', path: '/' },
-        { label: 'Packages', path: '/packages', hasDropdown: true },
+        { label: 'Stays', path: '/rooms', hasDropdown: true, categoryType: 'rooms' },
+        { label: 'Packages', path: '/packages', hasDropdown: true, categoryType: 'packages' },
         // { label: 'About Us', path: '/about' },
         { label: 'Contact', path: '/contact-us' }
       ] as NavItem[]
@@ -316,6 +318,17 @@ export default defineComponent({
         // Initialize with empty categories if fetch fails
         this.categories = [];
       }
+    },
+
+    /**
+     * Gets relevant parent categories based on the category type (rooms or packages)
+     * @param categoryType - The type of category to get (rooms or packages)
+     * @returns Array<Category> - Array of parent categories for the given type
+     */
+    getRelevantCategories(categoryType: string): Category[] {
+      // For now, we use the same categories for both, but this can be extended
+      // to filter based on categoryType if needed in the future
+      return this.parentCategories;
     },
 
     /**
