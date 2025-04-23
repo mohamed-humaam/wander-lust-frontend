@@ -84,6 +84,17 @@ const { data: roomsData, error, pending } = await useAsyncData(
                 room => room.room_links?.some(link => link.category?.slug === slug)
             );
 
+            // Process images for category and rooms
+            if (category?.images?.length) {
+              category.images = category.images.map(img => formatImagePath(img));
+            }
+
+            filteredRooms.forEach(room => {
+              if (room.images?.length) {
+                room.images = room.images.map(img => formatImagePath(img));
+              }
+            });
+
             return { category, filteredRooms };
           }
         }
@@ -98,42 +109,36 @@ const { data: roomsData, error, pending } = await useAsyncData(
     }
 );
 
-// Use the category from rooms data
-const category = computed(() => {
-  if (!isMounted.value) return null;
-  return roomsData.value?.category || null;
-});
+// Format image path to include proper storage path
+const formatImagePath = (imagePath) => {
+  if (!imagePath) return '';
 
-const filteredRooms = computed(() => {
-  if (!isMounted.value) return [];
-  return roomsData.value?.filteredRooms || [];
-});
+  // If already a full URL or already has storage/, return as-is
+  if (imagePath.startsWith('http') || imagePath.includes('storage/')) {
+    return imagePath;
+  }
 
-// Compute the background image style with safe checks
+  // Remove leading slash if present
+  const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+
+  // Add storage/ prefix if not already present
+  if (!cleanPath.startsWith('storage/')) {
+    return `storage/${cleanPath}`;
+  }
+
+  return cleanPath;
+};
+
+// Compute the background image style with proper URL
 const categoryBackgroundStyle = computed(() => {
   if (category.value?.images?.length) {
     const imagePath = category.value.images[0];
-
-    if (imagePath.startsWith('http')) {
-      return {
-        backgroundImage: `url(${imagePath})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      };
-    }
-
-    let cleanPath = imagePath;
-    // Make sure the path doesn't already have "storage/" at the beginning
-    if (!cleanPath.startsWith('storage/')) {
-      cleanPath = `storage/${cleanPath}`;
-    }
-
-    if (cleanPath.startsWith('/')) {
-      cleanPath = cleanPath.substring(1);
-    }
+    const fullUrl = imagePath.startsWith('http')
+        ? imagePath
+        : `https://admin.wanderlustadventuresmv.com/${imagePath}`;
 
     return {
-      backgroundImage: `url(${baseUrl.replace('/api', '')}/${cleanPath})`,
+      backgroundImage: `url(${fullUrl})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center'
     };
