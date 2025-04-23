@@ -122,7 +122,7 @@ const { data, pending, error } = useGetResourceWithRelations(
 
 // Watch for data changes
 watchEffect(() => {
-  if (data.value) {
+  if (data?.value) {
     // Filter the data to get only the package with matching ID
     const filteredPackage = Array.isArray(data.value)
         ? data.value.find(pkg => pkg.id == packageId)
@@ -137,8 +137,17 @@ watchEffect(() => {
     isLoading.value = false;
   }
 
+  if (!data?.value) {
+    console.warn("No data available, API may have failed");
+    return;
+  }
+  if (!packageId) {
+    console.error("Invalid package ID:", packageId);
+    return;
+  }
   if (error.value) {
-    console.error('Error fetching package:', error.value);
+    console.error("Error fetching package:", error.value);
+    packageData.value = null; // Prevent undefined state
     isLoading.value = false;
   }
 });
