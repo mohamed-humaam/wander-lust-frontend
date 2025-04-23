@@ -59,12 +59,14 @@
 import ProductCard from '~/components/packages/ProductCard.vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import {usePackages} from "~/composables/api-fetch.js";
 
 // Router setup for navigation
 const router = useRouter();
 
 // Fetch packages data
 const { data: packages, status, error } = await usePackages();
+
 
 // Add error handling
 if (error.value) {
