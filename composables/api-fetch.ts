@@ -4,7 +4,12 @@ import type { UseFetchOptions } from "#app";
 export function useApiFetch<T>(path: string, options?: UseFetchOptions<T>) {
     const headers = useRequestHeaders(["cookie"]);
     const baseURL = useRuntimeConfig().public.apiBase;
-    return useFetch(path, { ...options, headers, baseURL });
+    // return useFetch(path, { ...options, headers, baseURL });
+    return useFetch(path, { ...options, headers, baseURL })
+        .catch((error) => {
+            console.error(`API fetch error at ${path}:`, error);
+            return null;
+        });
 }
 
 // Users
