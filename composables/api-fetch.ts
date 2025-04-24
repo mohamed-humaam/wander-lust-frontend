@@ -112,3 +112,21 @@ export const usePackages = () => {
         "features"
     ]);
 }
+
+export const useLocations = () => {
+    return useGetResourceWithRelations("locations", {}, [
+        "category",
+        "rooms",
+        "amenities",
+        "activities",
+    ])
+}
+
+export const useRooms = () => {
+    return useGetResourceWithRelations("rooms", {}, [
+        "category",
+        "location",
+        "amenities",
+        "activities",
+    ])
+}
